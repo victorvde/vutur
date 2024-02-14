@@ -1,4 +1,6 @@
-.PHONY: venv requirements.txt requirements-dev.txt install format lint
+.PHONY: venv requirements.txt requirements-dev.txt install format lint typecheck all
+
+all: format lint typecheck
 
 venv: 
 	python3 -m venv .venv
