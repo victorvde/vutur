@@ -13,7 +13,7 @@ class VulkanContext:
         self.extensions: set[str] = set()
 
         self.create_instance(
-            version=vk.VK_API_VERSION_1_1,
+            version=vk.VK_MAKE_VERSION(1, 1, 0),
             opt_layers={"VK_LAYER_LUNARG_standard_validation"},
             opt_extensions=set(),
             req_extensions=set(),
