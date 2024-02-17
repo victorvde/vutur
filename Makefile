@@ -6,13 +6,13 @@ venv:
 	python3 -m venv .venv
 
 requirements.txt:
-	pip-compile --upgrade
+	uv pip compile pyproject.toml --upgrade -o requirements.txt
 
 requirements-dev.txt:
-	pip-compile --extra dev -o requirements-dev.txt
+	uv pip compile pyproject.toml --extra dev -o requirements-dev.txt
 
-install:
-	pip-sync requirements.txt requirements-dev.txt
+install: requirements-dev.txt
+	uv pip sync requirements-dev.txt
 
 format:
 	ruff format
