@@ -1,9 +1,17 @@
 # adapted from https://github.com/realitix/vulkan/blob/master/example/contribs/example_mandelbrot_compute.py
 # which is a port from https://github.com/Erkaman/vulkan_minimal_compute
 
-# import logging
+import logging
+from typing import Any
 
 import vulkan as vk
+
+DEBUG_LAYER = "VK_LAYER_KHRONOS_validation"
+DEBUG_EXTENSION = "VK_EXT_debug_utils"
+
+
+def debug_callback(*args: Any) -> None:
+    print("debug callback called")
 
 
 class VulkanContext:
@@ -11,15 +19,43 @@ class VulkanContext:
         self.instance = None
         self.layers: set[str] = set()
         self.extensions: set[str] = set()
+        self.debug_callback = None
 
         self.create_instance(
             version=vk.VK_MAKE_VERSION(1, 1, 0),
-            opt_layers={"VK_LAYER_LUNARG_standard_validation"},
-            opt_extensions=set(),
+            opt_layers={DEBUG_LAYER},
+            opt_extensions={DEBUG_EXTENSION},
             req_extensions=set(),
         )
 
+        if DEBUG_EXTENSION in self.extensions:
+            func = vk.vkGetInstanceProcAddr(
+                self.instance, "vkCreateDebugUtilsMessengerEXT"
+            )
+            cb = vk.VkDebugUtilsMessengerCreateInfoEXT(
+                sType=vk.VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+                pNext=None,
+                flags=0,
+                messageSeverity=vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+                messageType=vk.VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+                pfnUserCallback=debug_callback,
+                pUserData=None,
+            )
+            self.debug_callback = func(self.instance, cb, None)
+
     def __del__(self) -> None:
+        if self.debug_callback:
+            func = vk.vkGetInstanceProcAddr(
+                self.instance, "vkDestroyDebugUtilsMessengerEXT"
+            )
+            assert func
+            func(self.instance, self.debug_callback, None)
+
         if self.instance:
             vk.vkDestroyInstance(self.instance, None)
 
@@ -35,9 +71,6 @@ class VulkanContext:
         }
         layers = available_layers & opt_layers
 
-        # We need to enable an extension named VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
-        # in order to be able to print the warnings emitted by the validation layer.
-        # So again, we just check if the extension is among the supported extensions.
         available_extensions = {
             prop.extensionName
             for prop in vk.vkEnumerateInstanceExtensionProperties(None)
@@ -48,6 +81,11 @@ class VulkanContext:
                 f"Missing required Vulkan extensions: {missing_extensions}"
             )
         extensions = available_extensions & (opt_extensions | req_extensions)
+
+        logging.debug(f"{available_layers=}")
+        logging.debug(f"{available_extensions}")
+        logging.debug(f"{layers=}")
+        logging.debug(f"{extensions=}")
 
         applicationInfo = vk.VkApplicationInfo(
             sType=vk.VK_STRUCTURE_TYPE_APPLICATION_INFO,
