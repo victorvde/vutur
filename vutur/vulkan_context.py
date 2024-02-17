@@ -2,7 +2,7 @@
 # which is a port from https://github.com/Erkaman/vulkan_minimal_compute
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
 import vulkan as vk
 
@@ -31,6 +31,10 @@ class VulkanContext:
         self.layers: set[str] = set()
         self.extensions: set[str] = set()
         self.debug_callback = None
+        self.physicaldevice = None
+        self.queuefamily: Optional[int] = None
+        self.device = None
+        self.queue = None
 
         self.create_instance(
             version=vk.VK_MAKE_VERSION(1, 1, 0),
@@ -38,26 +42,9 @@ class VulkanContext:
             opt_extensions={DEBUG_EXTENSION},
             req_extensions=set(),
         )
-
-        if DEBUG_EXTENSION in self.extensions:
-            func = vk.vkGetInstanceProcAddr(
-                self.instance, "vkCreateDebugUtilsMessengerEXT"
-            )
-            cb = vk.VkDebugUtilsMessengerCreateInfoEXT(
-                sType=vk.VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-                pNext=None,
-                flags=0,
-                messageSeverity=vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
-                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-                messageType=vk.VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-                | vk.VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
-                | vk.VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-                pfnUserCallback=debug_callback,
-                pUserData=None,
-            )
-            self.debug_callback = func(self.instance, cb, None)
+        self.create_debug_callback()
+        self.create_physical_device()
+        self.create_device()
 
     def __del__(self) -> None:
         if self.debug_callback:
@@ -66,7 +53,8 @@ class VulkanContext:
             )
             assert func
             func(self.instance, self.debug_callback, None)
-
+        if self.device:
+            vk.vkDestroyDevice(self.device, None)
         if self.instance:
             vk.vkDestroyInstance(self.instance, None)
 
@@ -124,6 +112,69 @@ class VulkanContext:
         self.instance = vk.vkCreateInstance(createInfo, None)
         self.layers = layers
         self.extensions = extensions
+
+    def create_debug_callback(self) -> None:
+        if DEBUG_EXTENSION in self.extensions:
+            func = vk.vkGetInstanceProcAddr(
+                self.instance, "vkCreateDebugUtilsMessengerEXT"
+            )
+            cb = vk.VkDebugUtilsMessengerCreateInfoEXT(
+                sType=vk.VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+                pNext=None,
+                flags=0,
+                messageSeverity=vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+                messageType=vk.VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+                | vk.VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+                pfnUserCallback=debug_callback,
+                pUserData=None,
+            )
+            self.debug_callback = func(self.instance, cb, None)
+
+    def create_physical_device(self) -> None:
+        physical_devices = vk.vkEnumeratePhysicalDevices(self.instance)
+        if len(physical_devices) == 1:
+            r = physical_devices[0]
+        else:
+            # TODO: figure something out based on env variable or deviceType
+            raise NotImplementedError
+        self.physicaldevice = r
+
+    def create_device(self) -> None:
+        queue_families = vk.vkGetPhysicalDeviceQueueFamilyProperties(
+            self.physicaldevice
+        )
+        for i, props in enumerate(queue_families):
+            if props.queueCount > 0 and props.queueFlags & vk.VK_QUEUE_COMPUTE_BIT:
+                break
+        else:
+            raise ValueError("No availabe compute queues on selected device")
+        self.queuefamily = i
+
+        qci = vk.VkDeviceQueueCreateInfo(
+            sType=vk.VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+            queueFamilyIndex=self.queuefamily,
+            queueCount=1,
+            pQueuePriorities=[
+                1.0
+            ],  # we only have one queue, so this is not that imporant.
+        )
+
+        deviceFeatures = vk.VkPhysicalDeviceFeatures()
+        dci = vk.VkDeviceCreateInfo(
+            sType=vk.VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+            enabledLayerCount=len(self.layers),
+            ppEnabledLayerNames=self.layers,
+            pQueueCreateInfos=qci,
+            queueCreateInfoCount=1,
+            pEnabledFeatures=deviceFeatures,
+        )
+
+        self.device = vk.vkCreateDevice(self.physicaldevice, dci, None)
+        self.queue = vk.vkGetDeviceQueue(self.device, self.queuefamily, 0)
 
 
 # class VulkanContext:
