@@ -10,8 +10,19 @@ DEBUG_LAYER = "VK_LAYER_KHRONOS_validation"
 DEBUG_EXTENSION = "VK_EXT_debug_utils"
 
 
-def debug_callback(*args: Any) -> None:
-    print("debug callback called")
+def debug_callback(severity: int, messagetype: int, data: Any, _userdata: Any) -> bool:
+    message = f"VK [{vk.ffi.string(data.pMessageIdName).decode()}] [{vk.ffi.string(data.pMessage).decode()}]"
+    if severity & vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+        logging.error(message)
+    elif severity & vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+        logging.warning(message)
+    elif severity & vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+        logging.info(message)
+    elif severity & vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+        logging.debug(message)
+    else:
+        assert False, severity
+    return False
 
 
 class VulkanContext:
