@@ -19,6 +19,9 @@ dev = [
     "pytest",
 ]
 
+[tool.mypy]
+exclude = ["tests/"]
+
 [[tool.mypy.overrides]]
 module = "vulkan.*"
 ignore_missing_imports = true
