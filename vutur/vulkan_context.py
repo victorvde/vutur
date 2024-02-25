@@ -1,6 +1,7 @@
 # adapted from https://github.com/realitix/vulkan/blob/master/example/contribs/example_mandelbrot_compute.py
 # which is a port from https://github.com/Erkaman/vulkan_minimal_compute
 
+import os
 import logging
 from typing import Any, Optional
 
@@ -10,8 +11,12 @@ DEBUG_LAYER = "VK_LAYER_KHRONOS_validation"
 DEBUG_EXTENSION = "VK_EXT_debug_utils"
 
 
+def cs(c: Any) -> str:
+    return vk.ffi.string(c).decode()
+
+
 def debug_callback(severity: int, messagetype: int, data: Any, _userdata: Any) -> bool:
-    message = f"VK [{vk.ffi.string(data.pMessageIdName).decode()}] [{vk.ffi.string(data.pMessage).decode()}]"
+    message = f"VK [{cs(data.pMessageIdName)}] [{cs(data.pMessage)}]"
     if severity & vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
         logging.error(message)
     elif severity & vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
@@ -26,12 +31,16 @@ def debug_callback(severity: int, messagetype: int, data: Any, _userdata: Any) -
 
 
 class VulkanContext:
-    def __init__(self) -> None:
+    def __init__(self, device_filter: Optional[str] = None) -> None:
+        if device_filter is None:
+            device_filter = os.getenv("VUTUR_DEVICE", "")
+
         self.instance = None
         self.layers: set[str] = set()
         self.extensions: set[str] = set()
         self.debug_callback = None
         self.physicaldevice = None
+        self.physicaldevice_properties = None
         self.queuefamily: Optional[int] = None
         self.device = None
         self.queue = None
@@ -43,7 +52,7 @@ class VulkanContext:
             req_extensions=set(),
         )
         self.create_debug_callback()
-        self.create_physical_device()
+        self.create_physical_device(device_filter)
         self.create_device()
 
     def __del__(self) -> None:
@@ -134,14 +143,47 @@ class VulkanContext:
             )
             self.debug_callback = func(self.instance, cb, None)
 
-    def create_physical_device(self) -> None:
+    def create_physical_device(self, device_filter: str) -> None:
         physical_devices = vk.vkEnumeratePhysicalDevices(self.instance)
-        if len(physical_devices) == 1:
-            r = physical_devices[0]
+        physical_devices_with = []
+        for pd in physical_devices:
+            props = vk.VkPhysicalDeviceProperties2(
+                sType=vk.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,
+            )
+            vk.vkGetPhysicalDeviceProperties2(pd, props)
+            name = cs(props.properties.deviceName)
+            physical_devices_with.append((pd, props, name))
+        # pick one
+        for dtype in [
+            vk.VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU,
+            vk.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU,
+            vk.VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU,
+            vk.VK_PHYSICAL_DEVICE_TYPE_CPU,
+            vk.VK_PHYSICAL_DEVICE_TYPE_OTHER,
+        ]:
+            filtered = []
+            for i, (pd, props, name) in enumerate(physical_devices_with):
+                if device_filter not in name:
+                    continue
+                if props.properties.deviceType != dtype:
+                    continue
+                filtered.append(i)
+            if len(filtered) > 1:
+                raise ValueError(
+                    f"Cannot choose between devices: {[physical_devices_with[i][2] for i in filtered]}"
+                )
+            elif len(filtered) == 1:
+                break
+            else:
+                continue
         else:
-            # TODO: figure something out based on env variable or deviceType
-            raise NotImplementedError
-        self.physicaldevice = r
+            raise ValueError(f'No devices matching "{device_filter}" found')
+        (
+            self.physicaldevice,
+            self.physicaldevice_properties,
+            selected_name,
+        ) = physical_devices_with[filtered[0]]
+        logging.info(f"Selected device {selected_name}")
 
     def create_device(self) -> None:
         queue_families = vk.vkGetPhysicalDeviceQueueFamilyProperties(
