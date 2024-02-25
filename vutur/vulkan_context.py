@@ -44,6 +44,7 @@ class VulkanContext:
         self.queuefamily: Optional[int] = None
         self.device = None
         self.queue = None
+        self.commandpool = None
 
         self.create_instance(
             version=vk.VK_MAKE_VERSION(1, 1, 0),
@@ -54,8 +55,11 @@ class VulkanContext:
         self.create_debug_callback()
         self.create_physical_device(device_filter)
         self.create_device()
+        self.create_commandpool()
 
     def __del__(self) -> None:
+        if self.commandpool:
+            vk.vkDestroyCommandPool(self.device, self.commandpool, None)
         if self.debug_callback:
             func = vk.vkGetInstanceProcAddr(
                 self.instance, "vkDestroyDebugUtilsMessengerEXT"
@@ -91,7 +95,7 @@ class VulkanContext:
         extensions = available_extensions & (opt_extensions | req_extensions)
 
         logging.debug(f"{available_layers=}")
-        logging.debug(f"{available_extensions}")
+        logging.debug(f"{available_extensions=}")
         logging.debug(f"{layers=}")
         logging.debug(f"{extensions=}")
 
@@ -217,6 +221,15 @@ class VulkanContext:
 
         self.device = vk.vkCreateDevice(self.physicaldevice, dci, None)
         self.queue = vk.vkGetDeviceQueue(self.device, self.queuefamily, 0)
+
+    def create_commandpool(self) -> None:
+        cpci = vk.VkCommandPoolCreateInfo(
+            sType=vk.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+            flags=0,
+            queueFamilyIndex=self.queuefamily,
+        )
+
+        self.commandpool = vk.vkCreateCommandPool(self.device, cpci, None)
 
 
 # class VulkanContext:
