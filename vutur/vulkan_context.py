@@ -231,6 +231,41 @@ class VulkanContext:
 
         self.commandpool = vk.vkCreateCommandPool(self.device, cpci, None)
 
+#     def allocate_array(self, size: int):
+#         if currently_allocated_array_size + size > max_memory:
+#             raise OutOfMemory
+
+#         if size > max_contiguous_size:
+#             raise NeedsFragmentation
+
+#         fit = find_best_fit
+
+#         if fit is None:
+#             if currently_allocated_allocation_size + size < max_memory:
+#                 if size < default_alloc_size:
+#                     try_allocate(max(size, default_alloc_size))
+#                     fit = find_best_fit
+
+#         if fit is None:
+#             if currently_allocated_allocation_size + size < max_memory:
+#                 if size < default_alloc_size:
+#                     try_allocate(size)
+#                     fit = find_best_fit
+
+#         if fit is None:
+#             extra_memory_needed = currently_allocated_array_size + size - currently_allocated_allocation_size
+#             if extra_memory_needed > 0:
+#                 allocate(extra_memory_needed)
+#             raise NeedsFragmentation
+
+# class VulkanArray:
+#     def __init__(self, vulkan_context: VulkanContext, shape: tuple[int]):
+#         self.shaps = shape
+#         self.vulkan_context = vulkan_context
+#         self.allocation = vulkan_context.allocate
+
+#     def __del__(self):
+#         # free or something
 
 # class VulkanContext:
 #     def __init__(self):
