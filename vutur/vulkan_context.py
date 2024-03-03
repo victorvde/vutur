@@ -45,6 +45,11 @@ class VulkanContext:
         self.device = None
         self.queue = None
         self.commandpool = None
+        self.memory_properties: Any = None
+        self.buffer_create_info: Any = None
+        self.buffer_requirements: Any = None
+        self.host_memory: Optional[int] = None
+        self.device_memory: Optional[int] = None
 
         self.create_instance(
             version=vk.VK_MAKE_VERSION(1, 1, 0),
@@ -56,6 +61,7 @@ class VulkanContext:
         self.create_physical_device(device_filter)
         self.create_device()
         self.create_commandpool()
+        self.create_memories()
 
     def __del__(self) -> None:
         if self.commandpool:
@@ -230,6 +236,46 @@ class VulkanContext:
         )
 
         self.commandpool = vk.vkCreateCommandPool(self.device, cpci, None)
+
+    def create_memories(self) -> None:
+        self.memory_properties = vk.VkPhysicalDeviceMemoryProperties2(
+            sType=vk.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2,
+        )
+        vk.vkGetPhysicalDeviceMemoryProperties2(
+            self.physicaldevice, self.memory_properties
+        )
+
+        self.buffer_create_info = vk.VkBufferCreateInfo(
+            sType=vk.VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+            size=1,
+            usage=vk.VK_BUFFER_USAGE_STORAGE_BUFFER_BIT
+            | vk.VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+            | vk.VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+            sharingMode=vk.VK_SHARING_MODE_EXCLUSIVE,
+        )
+        temp_buffer = vk.vkCreateBuffer(self.device, self.buffer_create_info, None)
+        self.buffer_requirements = vk.vkGetBufferMemoryRequirements(
+            self.device, temp_buffer
+        )
+        vk.vkDestroyBuffer(self.device, temp_buffer, None)
+
+        # see the documentation of VkPhysicalDeviceMemoryProperties for a detailed description.
+        def find_memory_type(bits: int, properties: int) -> int:
+            for i, mt in enumerate(self.memory_properties.memoryProperties.memoryTypes):
+                if bits & (1 << i) and (mt.propertyFlags & properties) == properties:
+                    return i
+            raise ValueError(f"Can't find memory type for {bits=} {properties}")
+
+        self.device_memory = find_memory_type(
+            self.buffer_requirements.memoryTypeBits,
+            vk.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        )
+        self.host_memory = find_memory_type(
+            self.buffer_requirements.memoryTypeBits,
+            vk.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        )
+
 
 #     def allocate_array(self, size: int):
 #         if currently_allocated_array_size + size > max_memory:
