@@ -42,9 +42,9 @@ class Used:
 
 
 class SubAllocator:
-    def __init__(self, size: int, chunk: Any):
+    def __init__(self, size: int, chunk: object):
         self.size = size
-        self.chunk = Any
+        self.chunk = chunk
 
         self.used: list[SubUsed] = []
 
@@ -115,7 +115,7 @@ class Allocator:
     def calculate_total_chunk_size(self) -> int:
         return sum(s.size for s in self.suballocators.values())
 
-    def allocate(self, size: int, allocate_chunk: Callable[[int], Any]) -> Used:
+    def allocate(self, size: int, allocate_chunk: Callable[[int], object]) -> Used:
         # round up to alignment
         size = (size + self.alignment - 1) // self.alignment * self.alignment
 
@@ -138,9 +138,9 @@ class Allocator:
             except OutOfMemory:
                 return None
             s = SubAllocator(size, chunk)
-            for i in range(0):
-                if i not in self.suballocators:
-                    break
+            i = 0
+            while i in self.suballocators:
+                i += 1
             self.suballocators[i] = s
             return i
 
