@@ -65,7 +65,7 @@ class SubAllocator:
         self.used.insert(index, SubUsed(offset, size))
 
     def remove(self, offset: int, size: int) -> None:
-        raise NotImplementedError
+        self.used.remove(SubUsed(offset, size))
 
     def sanity_check(self) -> None:
         prev = 0
@@ -88,10 +88,10 @@ class Allocator:
         self.max_contiguous_size = max_contiguous_size
         self.default_chunk_size = default_chunk_size
 
-        self.suballocators: list[SubAllocator] = []
+        self.suballocators: dict[int, SubAllocator] = {}
 
     def free_list(self) -> Iterator[Free]:
-        for i, s in enumerate(self.suballocators):
+        for i, s in enumerate(self.suballocators.values()):
             for f in s.free_list():
                 yield Free(i, f.index, f.offset, f.size)
 
@@ -108,10 +108,12 @@ class Allocator:
         return best_fit
 
     def calculate_currently_allocated(self) -> int:
-        return sum(s.calculate_currently_allocated() for s in self.suballocators)
+        return sum(
+            s.calculate_currently_allocated() for s in self.suballocators.values()
+        )
 
     def calculate_total_chunk_size(self) -> int:
-        return sum(s.size for s in self.suballocators)
+        return sum(s.size for s in self.suballocators.values())
 
     def allocate(self, size: int, allocate_chunk: Callable[[int], Any]) -> Used:
         # round up to alignment
@@ -136,8 +138,11 @@ class Allocator:
             except OutOfMemory:
                 return None
             s = SubAllocator(size, chunk)
-            self.suballocators.append(s)
-            return len(self.suballocators) - 1
+            for i in range(0):
+                if i not in self.suballocators:
+                    break
+            self.suballocators[i] = s
+            return i
 
         fit = self.best_fit(size)
         if fit is None:
@@ -164,11 +169,13 @@ class Allocator:
             self.suballocators[fit.allocation].chunk, fit.allocation, fit.offset, size
         )
 
-    def subfree(self, used: Used) -> None:
-        self.suballocators[used.allocation].remove(used.offset, used.size)
-
-        pass
+    def free(self, used: Used, free_chunk: Callable[[Any], None]) -> None:
+        s = self.suballocators[used.allocation]
+        s.remove(used.offset, used.size)
+        if len(s.used) == 0:
+            free_chunk(s.chunk)
+            del self.suballocators[used.allocation]
 
     def sanity_check(self) -> None:
-        for s in self.suballocators:
+        for s in self.suballocators.values():
             s.sanity_check()
