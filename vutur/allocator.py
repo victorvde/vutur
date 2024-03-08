@@ -91,7 +91,7 @@ class Allocator:
         self.suballocators: dict[int, SubAllocator] = {}
 
     def free_list(self) -> Iterator[Free]:
-        for i, s in enumerate(self.suballocators.values()):
+        for i, s in self.suballocators.items():
             for f in s.free_list():
                 yield Free(i, f.index, f.offset, f.size)
 
@@ -160,8 +160,8 @@ class Allocator:
                     else:
                         raise NeedsFragmentation
 
-        fit = self.best_fit(size)  # todo: only check new chunk?
-        assert fit is not None, "We just allocated a chunk so it should fit"
+            fit = self.best_fit(size)  # todo: only check new chunk?
+            assert fit is not None, "We just allocated a chunk so it should fit"
 
         self.suballocators[fit.allocation].insert(fit.index, fit.offset, size)
 
