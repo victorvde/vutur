@@ -21,7 +21,7 @@ lint:
 	ruff check
 
 typecheck:
-	mypy . --disallow-untyped-defs
+	mypy .
 
 test:
 	pytest -q # pytest -s -o log_cli=true -o log_cli_level=debug

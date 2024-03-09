@@ -6,14 +6,16 @@ from vutur.allocator import Allocator, OutOfMemory, NeedsFragmentation  # noqa: 
 
 
 class Memory:
-    def __init__(self) -> None:
-        self.chunks: list[int] = []
+    def __init__(self):
+        self.chunks = []
 
-    def allocate_succeed(self, size: int) -> int:
+    def allocate(self, size):
+        if sum(self.chunks) + size > 3072:
+            raise OutOfMemory
         self.chunks.append(size)
         return size
 
-    def free(self, chunk: int) -> None:
+    def free(self, chunk):
         self.chunks.remove(chunk)
 
 
@@ -32,8 +34,8 @@ def a() -> Allocator:
     )
 
 
-def test_small(a: Allocator, m: Memory) -> None:
-    u = a.allocate(1, m.allocate_succeed)
+def test_small(a, m):
+    u = a.allocate(1, m.allocate)
     assert u.chunk == 1024
     assert u.offset == 0
     assert u.size >= 1
@@ -42,31 +44,31 @@ def test_small(a: Allocator, m: Memory) -> None:
     assert len(m.chunks) == 0
 
 
-def test_big(a: Allocator, m: Memory) -> None:
-    u = a.allocate(2048, m.allocate_succeed)
+def test_big(a, m):
+    u = a.allocate(2048, m.allocate)
     assert u.chunk == 2048
     assert u.offset == 0
     assert u.size >= 2048
 
 
-def test_too_big(a: Allocator, m: Memory) -> None:
+def test_too_big(a, m):
     with pytest.raises(NeedsFragmentation):
-        a.allocate(3072, m.allocate_succeed)
+        a.allocate(3072, m.allocate)
 
-    u1 = a.allocate(3072 // 2, m.allocate_succeed)
-    u2 = a.allocate(3072 // 2, m.allocate_succeed)
+    u1 = a.allocate(3072 // 2, m.allocate)
+    u2 = a.allocate(3072 // 2, m.allocate)
 
     a.free(u1, m.free)
     a.free(u2, m.free)
     assert len(m.chunks) == 0
 
 
-def test_way_too_big(a: Allocator, m: Memory) -> None:
+def test_way_too_big(a, m):
     with pytest.raises(OutOfMemory):
-        a.allocate(8192, m.allocate_succeed)
+        a.allocate(8192, m.allocate)
 
 
-def test_random(a: Allocator, m: Memory) -> None:
+def test_random(a, m):
     import random
 
     random.seed(0)
@@ -78,7 +80,7 @@ def test_random(a: Allocator, m: Memory) -> None:
         if c == "ALLOC":
             size = random.randrange(2500)
             try:
-                u = a.allocate(size, m.allocate_succeed)
+                u = a.allocate(size, m.allocate)
             except NeedsFragmentation:
                 pass
             except OutOfMemory:
