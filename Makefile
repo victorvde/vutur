@@ -1,4 +1,4 @@
-.PHONY: venv requirements.txt requirements-dev.txt install format lint typecheck test all
+.PHONY: venv requirements.txt requirements-dev.txt install format lint typecheck test cov all
 
 all: format lint typecheck
 
@@ -24,4 +24,8 @@ typecheck:
 	mypy . --disallow-untyped-defs
 
 test:
-	pytest # pytest -s -o log_cli=true -o log_cli_level=debug
+	pytest -q # pytest -s -o log_cli=true -o log_cli_level=debug
+
+cov:
+	pytest -q --cov=vutur --cov-report html
+	xdg-open htmlcov/index.html

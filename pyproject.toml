@@ -17,6 +17,7 @@ dev = [
     "mypy",
     "uv",
     "pytest",
+    "pytest-cov",
 ]
 
 [[tool.mypy.overrides]]
