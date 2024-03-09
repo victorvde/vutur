@@ -68,6 +68,30 @@ def test_way_too_big(a, m):
         a.allocate(8192, m.allocate)
 
 
+def test_oom(a, m):
+    u1 = a.allocate(1024, m.allocate)
+    u2 = a.allocate(1024, m.allocate)
+    u3 = a.allocate(1024, m.allocate)
+    with pytest.raises(OutOfMemory):
+        a.allocate(1024, m.allocate)
+    a.free(u1, m.free)
+    a.free(u2, m.free)
+    a.free(u3, m.free)
+    assert len(m.chunks) == 0
+
+
+def test_fragment(a, m):
+    u1 = a.allocate(768, m.allocate)
+    u2 = a.allocate(768, m.allocate)
+    u3 = a.allocate(768, m.allocate)
+    with pytest.raises(NeedsFragmentation):
+        a.allocate(768, m.allocate)
+    a.free(u1, m.free)
+    a.free(u2, m.free)
+    a.free(u3, m.free)
+    assert len(m.chunks) == 0
+
+
 def test_random(a, m):
     import random
 

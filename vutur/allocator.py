@@ -137,7 +137,7 @@ class Allocator:
                 chunk = allocate_chunk(chunk_size)
             except OutOfMemory:
                 return None
-            s = SubAllocator(size, chunk)
+            s = SubAllocator(chunk_size, chunk)
             i = 0
             while i in self.suballocators:
                 i += 1
