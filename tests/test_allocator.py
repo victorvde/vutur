@@ -55,11 +55,10 @@ def test_too_big(a, m):
     with pytest.raises(NeedsFragmentation):
         a.allocate(3072, m.allocate)
 
-    u1 = a.allocate(3072 // 2, m.allocate)
-    u2 = a.allocate(3072 // 2, m.allocate)
+    us = a.allocate_split(3072, m.allocate, m.free)
+    assert len(us) == 2
 
-    a.free(u1, m.free)
-    a.free(u2, m.free)
+    a.free_split(us, m.free)
     assert len(m.chunks) == 0
 
 
@@ -86,6 +85,9 @@ def test_fragment(a, m):
     u3 = a.allocate(768, m.allocate)
     with pytest.raises(NeedsFragmentation):
         a.allocate(768, m.allocate)
+    us = a.allocate_split(768, m.allocate, m.free)
+    assert len(us) == 3
+    a.free_split(us, m.free)
     a.free(u1, m.free)
     a.free(u2, m.free)
     a.free(u3, m.free)
