@@ -21,32 +21,32 @@ class SubFree:
 
 
 @dataclass
-class SubUsed:
+class SubAllocation:
     offset: int
     size: int
 
 
 @dataclass
 class Free:
-    allocation: int
+    suballocator: int
     index: int
     offset: int
     size: int
 
 
 @dataclass
-class Used:
+class Allocation:
     chunk: object
-    allocation: int
+    suballocator: int
     offset: int
     size: int
 
 
 @dataclass
-class SplitUsed:
+class SplitAllocation:
     offset: int
     size: int
-    used: Used
+    allocation: Allocation
 
 
 class SubAllocator:
@@ -54,32 +54,32 @@ class SubAllocator:
         self.size = size
         self.chunk = chunk
 
-        self.used: list[SubUsed] = []
+        self.allocations: list[SubAllocation] = []
 
-    # iterator over every hole between the used blocks and the hole at the end
+    # iterator over every hole between the allocated blocks and the hole at the end
     def free_list(self) -> Iterator[SubFree]:
         prev = 0
-        for i, u in enumerate(self.used):
-            free = u.offset - prev
+        for i, a in enumerate(self.allocations):
+            free = a.offset - prev
             yield SubFree(i, prev, free)
-            prev = u.offset + u.size
+            prev = a.offset + a.size
         free = self.size - prev
-        yield SubFree(len(self.used), prev, free)
+        yield SubFree(len(self.allocations), prev, free)
 
     def calculate_currently_allocated(self) -> int:
-        return sum(u.size for u in self.used)
+        return sum(a.size for a in self.allocations)
 
     def insert(self, index: int, offset: int, size: int) -> None:
-        self.used.insert(index, SubUsed(offset, size))
+        self.allocations.insert(index, SubAllocation(offset, size))
 
     def remove(self, offset: int, size: int) -> None:
-        self.used.remove(SubUsed(offset, size))
+        self.allocations.remove(SubAllocation(offset, size))
 
     def sanity_check(self) -> None:
         prev = 0
-        for u in self.used:
-            assert u.offset >= prev
-            prev = u.offset + u.size
+        for a in self.allocations:
+            assert a.offset >= prev
+            prev = a.offset + a.size
             assert prev <= self.size
 
 
@@ -125,7 +125,9 @@ class Allocator:
     def calculate_total_chunk_size(self) -> int:
         return sum(s.size for s in self.suballocators.values())
 
-    def allocate(self, size: int, allocate_chunk: Callable[[int], object]) -> Used:
+    def allocate(
+        self, size: int, allocate_chunk: Callable[[int], object]
+    ) -> Allocation:
         assert size > 0, "Can't allocate nothing"
 
         # round up to alignment
@@ -181,10 +183,13 @@ class Allocator:
             fit = self.best_fit(size)  # todo: only check new chunk?
             assert fit.size >= size, "We just allocated a chunk so it should fit"
 
-        self.suballocators[fit.allocation].insert(fit.index, fit.offset, size)
+        self.suballocators[fit.suballocator].insert(fit.index, fit.offset, size)
 
-        return Used(
-            self.suballocators[fit.allocation].chunk, fit.allocation, fit.offset, size
+        return Allocation(
+            self.suballocators[fit.suballocator].chunk,
+            fit.suballocator,
+            fit.offset,
+            size,
         )
 
     def allocate_split(
@@ -192,38 +197,38 @@ class Allocator:
         size: int,
         allocate_chunk: Callable[[int], object],
         free_chunk: Callable[[Any], None],
-    ) -> list[SplitUsed]:
-        splits: list[SplitUsed] = []
+    ) -> list[SplitAllocation]:
+        splits: list[SplitAllocation] = []
         offset = 0
         split_size = size
         while size > 0:
             try:
-                u = self.allocate(split_size, allocate_chunk)
+                a = self.allocate(split_size, allocate_chunk)
             except NeedsFragmentation as e:
                 split_size = e.size_hint
             except OutOfMemory:
                 for s in splits:
-                    self.free(s.used, free_chunk)
+                    self.free(s.allocation, free_chunk)
                 raise
             else:
                 size -= split_size
                 offset += split_size
-                splits.append(SplitUsed(offset, split_size, u))
+                splits.append(SplitAllocation(offset, split_size, a))
                 split_size = size
         return splits
 
-    def free(self, used: Used, free_chunk: Callable[[Any], None]) -> None:
-        s = self.suballocators[used.allocation]
-        s.remove(used.offset, used.size)
-        if len(s.used) == 0:
+    def free(self, allocation: Allocation, free_chunk: Callable[[Any], None]) -> None:
+        s = self.suballocators[allocation.suballocator]
+        s.remove(allocation.offset, allocation.size)
+        if len(s.allocations) == 0:
             free_chunk(s.chunk)
-            del self.suballocators[used.allocation]
+            del self.suballocators[allocation.suballocator]
 
     def free_split(
-        self, used: list[SplitUsed], free_chunk: Callable[[Any], None]
+        self, splitallocation: list[SplitAllocation], free_chunk: Callable[[Any], None]
     ) -> None:
-        for u in used:
-            self.free(u.used, free_chunk)
+        for a in splitallocation:
+            self.free(a.allocation, free_chunk)
 
     def sanity_check(self) -> None:
         for s in self.suballocators.values():
