@@ -50,7 +50,7 @@ class SplitUsed:
 
 
 class SubAllocator:
-    def __init__(self, size: int, chunk: object):
+    def __init__(self, size: int, chunk: object) -> None:
         self.size = size
         self.chunk = chunk
 
@@ -90,7 +90,7 @@ class Allocator:
         max_memory: int,
         max_contiguous_size: int,
         default_chunk_size: int,
-    ):
+    ) -> None:
         self.alignment = alignment
         self.max_memory = max_memory
         self.max_contiguous_size = max_contiguous_size
