@@ -100,11 +100,12 @@ def test_random(a, m):
     random.seed(0)
 
     ul = []
+    usl = []
 
     for i in range(10000):
-        c = random.choice(["ALLOC", "FREE"])
+        c = random.choice(["ALLOC", "ALLOC_SPLIT", "FREE"])
         if c == "ALLOC":
-            size = random.randrange(2500)
+            size = random.randrange(1, 2500)
             try:
                 u = a.allocate(size, m.allocate)
             except NeedsFragmentation:
@@ -114,11 +115,32 @@ def test_random(a, m):
             else:
                 assert size <= 2048
                 ul.append(u)
+        elif c == "ALLOC_SPLIT":
+            size = random.randrange(1, 2500)
+            try:
+                u = a.allocate_split(size, m.allocate, m.free)
+            except OutOfMemory:
+                assert a.calculate_currently_allocated() + size > 3072
+                pass
+            else:
+                assert size <= 2048
+                usl.append(u)
         elif c == "FREE":
             if len(ul) > 0:
                 ui = random.randrange(len(ul))
                 a.free(ul[ui], m.free)
                 del ul[ui]
+        elif c == "FREE_SPLIT":
+            if len(usl) > 0:
+                ui = random.randrange(len(usl))
+                a.free_split(usl[ui], m.free)
+                del usl[ui]
         else:
             assert False, c
         a.sanity_check()
+
+    for u in ul:
+        a.free(u, m.free)
+    for u in usl:
+        a.free_split(u, m.free)
+    assert len(m.chunks) == 0
