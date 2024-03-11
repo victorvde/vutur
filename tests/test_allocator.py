@@ -88,6 +88,8 @@ def test_fragment(a: Allocator, m: Memory) -> None:
     us = a.allocate_split(768, m.allocate, m.free)
     assert len(us) == 3
     a.free_split(us, m.free)
+    with pytest.raises(OutOfMemory):
+        a.allocate_split(1024, m.allocate, m.free)
     a.free(u1, m.free)
     a.free(u2, m.free)
     a.free(u3, m.free)

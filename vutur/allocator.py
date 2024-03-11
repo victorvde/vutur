@@ -122,9 +122,6 @@ class Allocator:
             s.calculate_currently_allocated() for s in self.suballocators.values()
         )
 
-    def calculate_total_chunk_size(self) -> int:
-        return sum(s.size for s in self.suballocators.values())
-
     def allocate(
         self, size: int, allocate_chunk: Callable[[int], object]
     ) -> Allocation:
@@ -133,6 +130,7 @@ class Allocator:
         # round up to alignment
         size = (size + self.alignment - 1) // self.alignment * self.alignment
 
+        # this check is not strictly necessary, but probably a good idea especially for allocate_split
         currently_allocated = (
             self.calculate_currently_allocated()
         )  # todo: don't recalculate every time
