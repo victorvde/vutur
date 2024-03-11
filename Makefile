@@ -1,4 +1,4 @@
-.PHONY: venv requirements.txt requirements-dev.txt install format lint typecheck test cov all
+.PHONY: venv requirements.txt requirements-dev.txt install format lint typecheck test cov docs all
 
 all: format lint typecheck
 
@@ -29,3 +29,6 @@ test:
 cov:
 	pytest -q --cov=vutur --cov-report html
 	xdg-open htmlcov/index.html
+
+docs:
+	pdoc vutur -o docs_build

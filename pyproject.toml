@@ -16,8 +16,11 @@ dev = [
     "ruff",
     "mypy",
     "uv",
+    # testing
     "pytest",
     "pytest-cov",
+    # docs
+    "pdoc",
 ]
 
 [tool.mypy]
