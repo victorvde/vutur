@@ -1,15 +1,32 @@
+"""
+Turns big chunks of memory into smaller allocations.
+Tailored to Vulkan, for example by being able to split allocations bigger than the maximum buffer size into multiple allocations.
+"""
+
 from typing import Iterator, Optional, Callable, Any
 
 from dataclasses import dataclass
 
+__all__ = [
+    "NeedsFragmentation",
+    "OutOfMemory",
+    "Allocation",
+    "Allocator",
+]
+
 
 @dataclass
 class NeedsFragmentation(Exception):
+    """Cannot allocate a single allocation of the requested size."""
+
     msg: str
     size_hint: int
+    """Try using this size instead."""
 
 
 class OutOfMemory(Exception):
+    "There is no way to allocate the requested size."
+
     msg: str
 
 
@@ -36,17 +53,16 @@ class Free:
 
 @dataclass
 class Allocation:
+    """A single allocation within one of the chunks"""
+
     chunk: object
+    """The chunk object as returned by the user specified chunk allocation function"""
     suballocator: int
+    """@private"""
     offset: int
+    """Offset within the chunk."""
     size: int
-
-
-@dataclass
-class SplitAllocation:
-    offset: int
-    size: int
-    allocation: Allocation
+    """Size of the allocation."""
 
 
 class SubAllocator:
@@ -56,7 +72,6 @@ class SubAllocator:
 
         self.allocations: list[SubAllocation] = []
 
-    # iterator over every hole between the allocated blocks and the hole at the end
     def free_list(self) -> Iterator[SubFree]:
         prev = 0
         for i, a in enumerate(self.allocations):
@@ -92,20 +107,38 @@ class Allocator:
         default_chunk_size: int,
     ) -> None:
         self.alignment = alignment
+        """Minimum alignment of each allocation (e.g. `VkMemoryRequirements.alignment`), sizes are rounded up to this."""
         self.max_memory = max_memory
+        """
+        Absolute maximum amount of memory that can be allocated (e.g. `VkPhysicalDeviceVulkan11Properties.maxMemoryAllocationSize`).
+        Only used as a quick check, the user defined allocation function is allowed to fail before this value.
+        """
         self.max_contiguous_size = max_contiguous_size
+        """Maximum contiguous size (e.g. `VkPhysicalDeviceLimits.maxStorageBufferRange`)."""
         self.default_chunk_size = default_chunk_size
-
+        """
+        Try to allocate at least this size per chunk.
+        Too small creates too many chunks, too big wastes memory that other programs could use.
+        Something like `max_memory // 16` is a decent trade-off.
+        """
         self.suballocators: dict[int, SubAllocator] = {}
+        """@private"""
 
     def free_list(self) -> Iterator[Free]:
+        """
+        @private
+        iterator over every hole between the allocated blocks and the hole at the end
+        """
         for i, s in self.suballocators.items():
             for f in s.free_list():
                 yield Free(i, f.index, f.offset, f.size)
 
-    # returns the smallest free area bigger than size, or the largest free aeea if there isn't a big enough free area
-    # todo: smarter data structure?
     def best_fit(self, size: int) -> Free:
+        """
+        @private
+        returns the smallest free area bigger than size, or the largest free aeea if there isn't a big enough free area
+        """
+        # todo: smarter data structure?
         best_fit = Free(-1, 0, 0, 0)  # empty
         for free in self.free_list():
             if best_fit.size < size:
@@ -118,6 +151,7 @@ class Allocator:
         return best_fit
 
     def calculate_currently_allocated(self) -> int:
+        """Returns total size of all allocations."""
         return sum(
             s.calculate_currently_allocated() for s in self.suballocators.values()
         )
@@ -125,6 +159,14 @@ class Allocator:
     def allocate(
         self, size: int, allocate_chunk: Callable[[int], object]
     ) -> Allocation:
+        """
+        Create a single allocation.
+        * `size`: requested size for the allocation
+        * `allocate_chunk`: user-defined chunk allocation function (e.g. `vkAllocateMemory`/`vkCreateBuffer`).
+          May raise `OutOfMemory`.
+
+        Can raise `NeedsFragmentation` or `OutOfMemory`.
+        """
         assert size > 0, "Can't allocate nothing"
 
         # round up to alignment
@@ -146,6 +188,7 @@ class Allocator:
             )
 
         def new_chunk(chunk_size: int) -> Optional[int]:
+            """create a chunk and its suballocator"""
             try:
                 chunk = allocate_chunk(chunk_size)
             except OutOfMemory:
@@ -195,8 +238,17 @@ class Allocator:
         size: int,
         allocate_chunk: Callable[[int], object],
         free_chunk: Callable[[Any], None],
-    ) -> list[SplitAllocation]:
-        splits: list[SplitAllocation] = []
+    ) -> list[Allocation]:
+        """
+        Create an allocation that can be split into smaller pieces.
+        * `size`: requested size for the allocation.
+        * `allocate_chunk`: user-defined chunk allocation function (e.g. `vkAllocateMemory`/`vkCreateBuffer`).
+          May raise `OutOfMemory`.
+        * `free_chunk`: user-defined chunk free function (e.g. `vkFreeMemory`/`vkDestroyBuffer`).
+
+        Can raise `OutOfMemory`.
+        """
+        splits: list[Allocation] = []
         offset = 0
         split_size = size
         while size > 0:
@@ -205,17 +257,22 @@ class Allocator:
             except NeedsFragmentation as e:
                 split_size = e.size_hint
             except OutOfMemory:
-                for s in splits:
-                    self.free(s.allocation, free_chunk)
+                for a in splits:
+                    self.free(a, free_chunk)
                 raise
             else:
                 size -= split_size
                 offset += split_size
-                splits.append(SplitAllocation(offset, split_size, a))
+                splits.append(a)
                 split_size = size
         return splits
 
     def free(self, allocation: Allocation, free_chunk: Callable[[Any], None]) -> None:
+        """
+        Free an allocation.
+        * `allocation`: what to free.
+        * `free_chunk`: user-defined chunk free function (e.g. `vkFreeMemory`/`vkDestroyBuffer`).
+        """
         s = self.suballocators[allocation.suballocator]
         s.remove(allocation.offset, allocation.size)
         if len(s.allocations) == 0:
@@ -223,11 +280,19 @@ class Allocator:
             del self.suballocators[allocation.suballocator]
 
     def free_split(
-        self, splitallocation: list[SplitAllocation], free_chunk: Callable[[Any], None]
+        self, splitallocation: list[Allocation], free_chunk: Callable[[Any], None]
     ) -> None:
+        """
+        Free a split allocation.
+        * `splitallocation`: what to free.
+        * `free_chunk`: user-defined chunk free function (e.g. `vkFreeMemory`/`vkDestroyBuffer`).
+        """
         for a in splitallocation:
-            self.free(a.allocation, free_chunk)
+            self.free(a, free_chunk)
 
     def sanity_check(self) -> None:
+        """
+        Run internal consistency checks, for testing/debugging purposes.
+        """
         for s in self.suballocators.values():
             s.sanity_check()
