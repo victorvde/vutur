@@ -5,6 +5,8 @@ import os
 import logging
 from typing import Any, Optional
 
+from vutur.allocator import Allocator
+
 import vulkan as vk
 
 DEBUG_LAYER = "VK_LAYER_KHRONOS_validation"
@@ -38,18 +40,20 @@ class VulkanContext:
         self.instance = None
         self.layers: set[str] = set()
         self.extensions: set[str] = set()
-        self.debug_callback = None
-        self.physicaldevice = None
-        self.physicaldevice_properties = None
+        self.debug_callback: Any = None
+        self.physicaldevice: Any = None
+        self.physicaldevice_properties: Any = None
         self.queuefamily: Optional[int] = None
-        self.device = None
-        self.queue = None
-        self.commandpool = None
+        self.device: Any = None
+        self.queue: Any = None
+        self.commandpool: Any = None
         self.memory_properties: Any = None
         self.buffer_create_info: Any = None
         self.buffer_requirements: Any = None
-        self.host_memory: Optional[int] = None
-        self.device_memory: Optional[int] = None
+        self.host_memory: int = -1
+        self.device_memory: int = -1
+        self.host_allocator = None
+        self.device_allocator = None
 
         self.create_instance(
             version=vk.VK_MAKE_VERSION(1, 1, 0),
@@ -62,6 +66,11 @@ class VulkanContext:
         self.create_device()
         self.create_commandpool()
         self.create_memories()
+        self.host_allocator = self.create_allocator(self.host_memory)
+        if self.host_memory == self.device_memory:
+            self.device_allocator = self.host_allocator
+        else:
+            self.device_allocator = self.create_allocator(self.device_memory)
 
     def __del__(self) -> None:
         if self.commandpool:
@@ -276,33 +285,16 @@ class VulkanContext:
             | vk.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         )
 
+    def create_allocator(self, memtype: int) -> Allocator:
+        props = self.memory_properties.memoryProperties.memoryTypes[memtype]
+        heap = self.memory_properties.memoryProperties.memoryHeaps[props.heapIndex]
+        return Allocator(
+            alignment=self.buffer_requirements.alignment,
+            max_memory=heap.size,
+            max_contiguous_size=self.physicaldevice_properties.properties.limits.maxStorageBufferRange,
+            default_chunk_size=2**29,  # 512 MiB
+        )
 
-#     def allocate_array(self, size: int):
-#         if currently_allocated_array_size + size > max_memory:
-#             raise OutOfMemory
-
-#         if size > max_contiguous_size:
-#             raise NeedsFragmentation
-
-#         fit = find_best_fit
-
-#         if fit is None:
-#             if currently_allocated_allocation_size + size < max_memory:
-#                 if size < default_alloc_size:
-#                     try_allocate(max(size, default_alloc_size))
-#                     fit = find_best_fit
-
-#         if fit is None:
-#             if currently_allocated_allocation_size + size < max_memory:
-#                 if size < default_alloc_size:
-#                     try_allocate(size)
-#                     fit = find_best_fit
-
-#         if fit is None:
-#             extra_memory_needed = currently_allocated_array_size + size - currently_allocated_allocation_size
-#             if extra_memory_needed > 0:
-#                 allocate(extra_memory_needed)
-#             raise NeedsFragmentation
 
 # class VulkanArray:
 #     def __init__(self, vulkan_context: VulkanContext, shape: tuple[int]):
