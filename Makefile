@@ -1,4 +1,4 @@
-.PHONY: venv requirements.txt requirements-dev.txt install format lint typecheck test cov docs all
+.PHONY: venv requirements.txt requirements-dev.txt install format lint typecheck test test-v cov docs all
 
 all: format lint typecheck
 
@@ -24,7 +24,10 @@ typecheck:
 	mypy .
 
 test:
-	pytest -q # pytest -s -o log_cli=true -o log_cli_level=debug
+	pytest -q
+
+test-v:
+	pytest -s -o log_cli=true -o log_cli_level=debug
 
 cov:
 	pytest -q --cov=vutur --cov-report html

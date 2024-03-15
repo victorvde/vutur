@@ -33,27 +33,27 @@ def debug_callback(severity: int, messagetype: int, data: Any, _userdata: Any) -
 
 
 class VulkanContext:
+    instance: object  # vk.VkInstance
+    layers: set[str]
+    extensions: set[str]
+    debug_callback: object  # vk.VkDebugUtilsMessengerEXT
+    physicaldevice: object  # vk.VkPhysicalDevice
+    physicaldevice_properties: vk.VkPhysicalDeviceProperties2
+    queuefamily: int
+    device: object  # vk.VkDevice
+    queue: object  # vk.VkQueue
+    commandpool: object  # vk.vkCommandPool
+    memory_properties: vk.VkPhysicalDeviceMemoryProperties2
+    buffer_create_info: vk.VkBufferCreateInfo
+    buffer_requirements: vk.VkMemoryRequirements
+    host_memory: int
+    device_memory: int
+    host_allocator: Allocator
+    device_allocator: Allocator
+
     def __init__(self, device_filter: Optional[str] = None) -> None:
         if device_filter is None:
             device_filter = os.getenv("VUTUR_DEVICE", "")
-
-        self.instance = None
-        self.layers: set[str] = set()
-        self.extensions: set[str] = set()
-        self.debug_callback: Any = None
-        self.physicaldevice: Any = None
-        self.physicaldevice_properties: Any = None
-        self.queuefamily: Optional[int] = None
-        self.device: Any = None
-        self.queue: Any = None
-        self.commandpool: Any = None
-        self.memory_properties: Any = None
-        self.buffer_create_info: Any = None
-        self.buffer_requirements: Any = None
-        self.host_memory: int = -1
-        self.device_memory: int = -1
-        self.host_allocator = None
-        self.device_allocator = None
 
         self.create_instance(
             version=vk.VK_MAKE_VERSION(1, 1, 0),
@@ -73,17 +73,17 @@ class VulkanContext:
             self.device_allocator = self.create_allocator(self.device_memory)
 
     def __del__(self) -> None:
-        if self.commandpool:
+        if hasattr(self, "commandpool"):
             vk.vkDestroyCommandPool(self.device, self.commandpool, None)
-        if self.debug_callback:
+        if hasattr(self, "debug_callback"):
             func = vk.vkGetInstanceProcAddr(
                 self.instance, "vkDestroyDebugUtilsMessengerEXT"
             )
             assert func
             func(self.instance, self.debug_callback, None)
-        if self.device:
+        if hasattr(self, "device"):
             vk.vkDestroyDevice(self.device, None)
-        if self.instance:
+        if hasattr(self, "instance"):
             vk.vkDestroyInstance(self.instance, None)
 
     def create_instance(
