@@ -132,7 +132,6 @@ class VulkanContext:
         logging.debug(f"{self.extensions=}")
 
         applicationInfo = vk.VkApplicationInfo(
-            sType=vk.VK_STRUCTURE_TYPE_APPLICATION_INFO,
             pApplicationName=None,
             applicationVersion=0,
             pEngineName="vutur",
@@ -145,7 +144,6 @@ class VulkanContext:
             flags |= vk.VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT
 
         createInfo = vk.VkInstanceCreateInfo(
-            sType=vk.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             flags=flags,
             pApplicationInfo=applicationInfo,
             enabledLayerCount=len(self.layers),
@@ -162,7 +160,6 @@ class VulkanContext:
                 self.instance, "vkCreateDebugUtilsMessengerEXT"
             )
             cb = vk.VkDebugUtilsMessengerCreateInfoEXT(
-                sType=vk.VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
                 pNext=None,
                 flags=0,
                 messageSeverity=vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
@@ -181,9 +178,7 @@ class VulkanContext:
         physical_devices = vk.vkEnumeratePhysicalDevices(self.instance)
         physical_devices_with = []
         for pd in physical_devices:
-            props = vk.VkPhysicalDeviceProperties2(
-                sType=vk.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,
-            )
+            props = vk.VkPhysicalDeviceProperties2()
             vk.vkGetPhysicalDeviceProperties2(pd, props)
             name = cs(props.properties.deviceName)
             physical_devices_with.append((pd, props, name))
@@ -241,7 +236,6 @@ class VulkanContext:
         self.queuefamily = i
 
         qci = vk.VkDeviceQueueCreateInfo(
-            sType=vk.VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
             queueFamilyIndex=self.queuefamily,
             queueCount=1,
             pQueuePriorities=[
@@ -250,15 +244,12 @@ class VulkanContext:
         )
 
         timelineFeatures = vk.VkPhysicalDeviceTimelineSemaphoreFeatures(
-            sType=vk.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES,
             timelineSemaphore=True,
         )
         deviceFeatures = vk.VkPhysicalDeviceFeatures2(
-            sType=vk.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
             pNext=timelineFeatures,
         )
         dci = vk.VkDeviceCreateInfo(
-            sType=vk.VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             enabledLayerCount=len(self.layers),
             ppEnabledLayerNames=self.layers,
             enabledExtensionCount=len(self.device_extensions),
@@ -273,7 +264,6 @@ class VulkanContext:
 
     def create_commandpool(self) -> None:
         cpci = vk.VkCommandPoolCreateInfo(
-            sType=vk.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             flags=0,
             queueFamilyIndex=self.queuefamily,
         )
@@ -281,15 +271,12 @@ class VulkanContext:
         self.commandpool = vk.vkCreateCommandPool(self.device, cpci, None)
 
     def create_memories(self) -> None:
-        self.memory_properties = vk.VkPhysicalDeviceMemoryProperties2(
-            sType=vk.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2,
-        )
+        self.memory_properties = vk.VkPhysicalDeviceMemoryProperties2()
         vk.vkGetPhysicalDeviceMemoryProperties2(
             self.physicaldevice, self.memory_properties
         )
 
         self.buffer_create_info = vk.VkBufferCreateInfo(
-            sType=vk.VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
             size=1,
             usage=vk.VK_BUFFER_USAGE_STORAGE_BUFFER_BIT
             | vk.VK_BUFFER_USAGE_TRANSFER_SRC_BIT
