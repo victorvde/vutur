@@ -13,8 +13,18 @@ DEBUG_LAYER = "VK_LAYER_KHRONOS_validation"
 DEBUG_EXTENSION = "VK_EXT_debug_utils"
 
 
-def cs(c: Any) -> str:
+# utils
+def cs(c: object) -> str:
+    """Convert vulkan ffi string to str"""
     return vk.ffi.string(c).decode()
+
+
+def filter_set(available: set[str], optional: set[str], required: set[str]) -> set[str]:
+    """Get extensions/layers to activate given optional and required ones."""
+    missing = required - available
+    if len(missing) > 0:
+        raise ValueError(f"Missing required Vulkan: {missing}")
+    return available & (optional | required)
 
 
 def debug_callback(severity: int, messagetype: int, data: Any, _userdata: Any) -> bool:
@@ -58,7 +68,8 @@ class VulkanContext:
         self.create_instance(
             version=vk.VK_MAKE_VERSION(1, 1, 0),
             opt_layers={DEBUG_LAYER},
-            opt_extensions={DEBUG_EXTENSION},
+            req_layers=set(),
+            opt_extensions={vk.VK_EXT_DEBUG_UTILS_EXTENSION_NAME},
             req_extensions=set(),
         )
         self.create_debug_callback()
@@ -90,29 +101,27 @@ class VulkanContext:
         self,
         version: int,
         opt_layers: set[str],
+        req_layers: set[str],
         opt_extensions: set[str],
         req_extensions: set[str],
     ) -> None:
         available_layers = {
             prop.layerName for prop in vk.vkEnumerateInstanceLayerProperties()
         }
-        layers = available_layers & opt_layers
+        self.layers = filter_set(available_layers, opt_layers, set())
 
         available_extensions = {
             prop.extensionName
             for prop in vk.vkEnumerateInstanceExtensionProperties(None)
         }
-        missing_extensions = req_extensions - available_extensions
-        if missing_extensions:
-            raise ValueError(
-                f"Missing required Vulkan extensions: {missing_extensions}"
-            )
-        extensions = available_extensions & (opt_extensions | req_extensions)
+        self.extensions = filter_set(
+            available_extensions, opt_extensions, req_extensions
+        )
 
         logging.debug(f"{available_layers=}")
         logging.debug(f"{available_extensions=}")
-        logging.debug(f"{layers=}")
-        logging.debug(f"{extensions=}")
+        logging.debug(f"{self.layers=}")
+        logging.debug(f"{self.extensions=}")
 
         applicationInfo = vk.VkApplicationInfo(
             sType=vk.VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -124,22 +133,20 @@ class VulkanContext:
         )
 
         flags = 0
-        if vk.VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME in extensions:
+        if vk.VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME in self.extensions:
             flags |= vk.VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT
 
         createInfo = vk.VkInstanceCreateInfo(
             sType=vk.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             flags=flags,
             pApplicationInfo=applicationInfo,
-            enabledLayerCount=len(layers),
-            ppEnabledLayerNames=layers,
-            enabledExtensionCount=len(extensions),
-            ppEnabledExtensionNames=extensions,
+            enabledLayerCount=len(self.layers),
+            ppEnabledLayerNames=self.layers,
+            enabledExtensionCount=len(self.extensions),
+            ppEnabledExtensionNames=self.extensions,
         )
 
         self.instance = vk.vkCreateInstance(createInfo, None)
-        self.layers = layers
-        self.extensions = extensions
 
     def create_debug_callback(self) -> None:
         if DEBUG_EXTENSION in self.extensions:
