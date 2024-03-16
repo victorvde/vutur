@@ -13,3 +13,11 @@ def test_alloc() -> None:
     del h
     del d
     del c
+
+def test_alloc_ooo() -> None:
+    c = VulkanContext()
+    h = c.suballocate_host(100)
+    d = c.suballocate_device(100)
+    del c
+    del h
+    del d
