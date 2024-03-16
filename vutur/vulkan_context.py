@@ -49,6 +49,7 @@ class VulkanContext:
     debug_callback: object  # vk.VkDebugUtilsMessengerEXT
     physicaldevice: object  # vk.VkPhysicalDevice
     physicaldevice_properties: vk.VkPhysicalDeviceProperties2
+    device_extensions: set[str]
     queuefamily: int
     device: object  # vk.VkDevice
     queue: object  # vk.VkQueue
