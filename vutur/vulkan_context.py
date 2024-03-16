@@ -74,7 +74,10 @@ class VulkanContext:
         )
         self.create_debug_callback()
         self.create_physical_device(device_filter)
-        self.create_device()
+        self.create_device(
+            opt_extensions=set(),
+            req_extensions={vk.VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME},
+        )
         self.create_commandpool()
         self.create_memories()
         self.host_allocator = self.create_allocator(self.host_memory)
@@ -211,7 +214,17 @@ class VulkanContext:
         ) = physical_devices_with[filtered[0]]
         logging.info(f"Selected device {selected_name}")
 
-    def create_device(self) -> None:
+    def create_device(self, opt_extensions: set[str], req_extensions: set[str]) -> None:
+        available_device_extensions = {
+            e.extensionName
+            for e in vk.vkEnumerateDeviceExtensionProperties(self.physicaldevice, None)
+        }
+        self.device_extensions = filter_set(
+            available_device_extensions, opt_extensions, req_extensions
+        )
+        logging.debug(f"{available_device_extensions=}")
+        logging.debug(f"{self.device_extensions=}")
+
         queue_families = vk.vkGetPhysicalDeviceQueueFamilyProperties(
             self.physicaldevice
         )
@@ -236,7 +249,9 @@ class VulkanContext:
             sType=vk.VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             enabledLayerCount=len(self.layers),
             ppEnabledLayerNames=self.layers,
-            pQueueCreateInfos=qci,
+            enabledExtensionCount=len(self.device_extensions),
+            ppEnabledExtensionNames=self.device_extensions,
+            pQueueCreateInfos=[qci],
             queueCreateInfoCount=1,
             pEnabledFeatures=deviceFeatures,
         )

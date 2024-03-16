@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # https://stackoverflow.com/questions/66053955/how-to-make-sure-my-git-pre-commit-script-wont-get-fooled
 
 # create a temporary directory
@@ -10,6 +12,9 @@ trap "rm -rf $tmpdir" EXIT
 
 # check out the index
 git checkout-index --prefix=$tmpdir/ -af
+
+# copy mypy cache to speed things up
+cp -raf .mypy_cache "$tmpdir/"
 
 # run tests in a subshell so that we end up back in the current
 # directory when everything finishes.
