@@ -61,6 +61,7 @@ class VulkanContext:
     device_memory: int
     host_allocator: Allocator
     device_allocator: Allocator
+    timeline_semaphore: object  # vk.vkSemaphore
 
     def __init__(self, device_filter: Optional[str] = None) -> None:
         if device_filter is None:
@@ -86,8 +87,11 @@ class VulkanContext:
             self.device_allocator = self.host_allocator
         else:
             self.device_allocator = self.create_allocator(self.device_memory)
+        self.create_timeline_semaphore()
 
     def __del__(self) -> None:
+        if hasattr(self, "timeline_semaphore"):
+            vk.vkDestroySemaphore(self.device, self.timeline_semaphore, None)
         if hasattr(self, "commandpool"):
             vk.vkDestroyCommandPool(self.device, self.commandpool, None)
         if hasattr(self, "debug_callback"):
@@ -245,7 +249,14 @@ class VulkanContext:
             ],  # we only have one queue, so this is not that imporant.
         )
 
-        deviceFeatures = vk.VkPhysicalDeviceFeatures()
+        timelineFeatures = vk.VkPhysicalDeviceTimelineSemaphoreFeatures(
+            sType=vk.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES,
+            timelineSemaphore=True,
+        )
+        deviceFeatures = vk.VkPhysicalDeviceFeatures2(
+            sType=vk.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+            pNext=timelineFeatures,
+        )
         dci = vk.VkDeviceCreateInfo(
             sType=vk.VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             enabledLayerCount=len(self.layers),
@@ -254,7 +265,7 @@ class VulkanContext:
             ppEnabledExtensionNames=self.device_extensions,
             pQueueCreateInfos=[qci],
             queueCreateInfoCount=1,
-            pEnabledFeatures=deviceFeatures,
+            pNext=deviceFeatures,
         )
 
         self.device = vk.vkCreateDevice(self.physicaldevice, dci, None)
@@ -317,6 +328,16 @@ class VulkanContext:
             max_contiguous_size=self.physicaldevice_properties.properties.limits.maxStorageBufferRange,
             default_chunk_size=2**29,  # 512 MiB
         )
+
+    def create_timeline_semaphore(self) -> None:
+        stci = vk.VkSemaphoreTypeCreateInfo(
+            semaphoreType=vk.VK_SEMAPHORE_TYPE_TIMELINE,
+            initialValue=0,
+        )
+        sci = vk.VkSemaphoreCreateInfo(
+            pNext=stci,
+        )
+        self.timeline_semaphore = vk.vkCreateSemaphore(self.device, sci, None)
 
 
 # class VulkanArray:
