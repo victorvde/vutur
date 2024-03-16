@@ -1,11 +1,14 @@
 # adapted from https://github.com/realitix/vulkan/blob/master/example/contribs/example_mandelbrot_compute.py
 # which is a port from https://github.com/Erkaman/vulkan_minimal_compute
 
+from __future__ import annotations
+
+from dataclasses import dataclass
 import os
 import logging
 from typing import Any, Optional
 
-from vutur.allocator import Allocator
+from vutur.allocator import Allocator, Allocation, OutOfMemory
 
 import vulkan as vk
 
@@ -62,6 +65,7 @@ class VulkanContext:
     host_allocator: Allocator
     device_allocator: Allocator
     timeline_semaphore: object  # vk.vkSemaphore
+    timeline_host: int
 
     def __init__(self, device_filter: Optional[str] = None) -> None:
         if device_filter is None:
@@ -88,6 +92,7 @@ class VulkanContext:
         else:
             self.device_allocator = self.create_allocator(self.device_memory)
         self.create_timeline_semaphore()
+        print(f"{self.get_timeline_semaphore()=}")
 
     def __del__(self) -> None:
         if hasattr(self, "timeline_semaphore"):
@@ -325,16 +330,69 @@ class VulkanContext:
             pNext=stci,
         )
         self.timeline_semaphore = vk.vkCreateSemaphore(self.device, sci, None)
+        self.timeline_host = 0
+
+    def get_timeline_semaphore(self) -> int:
+        func = vk.vkGetInstanceProcAddr(self.instance, "vkGetSemaphoreCounterValueKHR")
+        return func(self.device, self.timeline_semaphore)
+
+    def suballocate_host(self, size: int) -> VulkanSuballocation:
+        return self.suballocate(size, self.host_memory, self.host_allocator)
+
+    def suballocate_device(self, size: int) -> VulkanSuballocation:
+        return self.suballocate(size, self.device_memory, self.device_allocator)
+
+    def allocate_chunk(self, chunk_size: int, memory: int) -> VulkanChunk:
+        mai = vk.vkMemoryAllocateInfo(
+            allocationSize=chunk_size,
+            memoryTypeIndex=memory,
+        )
+        try:
+            mem = vk.vkAllocateMemory(self.device, mai, None)
+        except (vk.VK_ERROR_OUT_OF_HOST_MEMORY, vk.VK_ERROR_OUT_OF_DEVICE_MEMORY):
+            raise OutOfMemory
+
+        bci = self.buffer_create_info.copy()
+        bci.size = chunk_size
+        buf = vk.vkCreateBuffer(self.device, bci, None)
+        vk.vkBindBufferMemory(self.device, buf, mem, 0)
+
+        return VulkanChunk(mem, buf)
+
+    def free_chunk(self, chunk: VulkanChunk) -> None:
+        vk.vkDestroyBuffer(chunk.buffer)
+        vk.vkFreeMemory(chunk.memory)
+
+    def suballocate(
+        self, size: int, memory: int, allocator: Allocator
+    ) -> VulkanSuballocation:
+        def alloc_chunk(chunk_size: int) -> VulkanChunk:
+            return self.allocate_chunk(chunk_size, memory)
+
+        def free_chunk(chunk: VulkanChunk) -> None:
+            return self.free_chunk(chunk)
+
+        allocation = allocator.allocate_split(size, alloc_chunk, free_chunk)
+        return VulkanSuballocation(self, allocation)
 
 
-# class VulkanArray:
-#     def __init__(self, vulkan_context: VulkanContext, shape: tuple[int]):
-#         self.shaps = shape
-#         self.vulkan_context = vulkan_context
-#         self.allocation = vulkan_context.allocate
+@dataclass
+class VulkanChunk:
+    memory: object  # vk.VkAllocation
+    buffer: object  # vk.VkBuffer
 
-#     def __del__(self):
-#         # free or something
+
+class VulkanSuballocation:
+    def __init__(
+        self, vulkan_context: VulkanContext, allocation: list[Allocation]
+    ) -> None:
+        self.vulkan_context = vulkan_context
+        self.allocation = allocation
+
+    def __del__(self) -> None:
+        pass
+        # self.vulkan_context.delayed_free(self.allocation)
+
 
 # class VulkanContext:
 #     def __init__(self):
