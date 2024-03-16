@@ -66,6 +66,7 @@ class VulkanContext:
     device_allocator: Allocator
     timeline_semaphore: object  # vk.vkSemaphore
     timeline_host: int
+    delayed_free: list[DelayedFree]
 
     def __init__(self, device_filter: Optional[str] = None) -> None:
         if device_filter is None:
@@ -92,9 +93,13 @@ class VulkanContext:
         else:
             self.device_allocator = self.create_allocator(self.device_memory)
         self.create_timeline_semaphore()
-        print(f"{self.get_timeline_semaphore()=}")
+        self.delayed_free = []
 
     def __del__(self) -> None:
+        if hasattr(self, "delayed_free"):
+            vk.vkDeviceWaitIdle(self.device)
+            self.maintain()
+            assert len(self.delayed_free) == 0, self.delayed_free
         if hasattr(self, "timeline_semaphore"):
             vk.vkDestroySemaphore(self.device, self.timeline_semaphore, None)
         if hasattr(self, "commandpool"):
@@ -343,7 +348,7 @@ class VulkanContext:
         return self.suballocate(size, self.device_memory, self.device_allocator)
 
     def allocate_chunk(self, chunk_size: int, memory: int) -> VulkanChunk:
-        mai = vk.vkMemoryAllocateInfo(
+        mai = vk.VkMemoryAllocateInfo(
             allocationSize=chunk_size,
             memoryTypeIndex=memory,
         )
@@ -352,7 +357,7 @@ class VulkanContext:
         except (vk.VK_ERROR_OUT_OF_HOST_MEMORY, vk.VK_ERROR_OUT_OF_DEVICE_MEMORY):
             raise OutOfMemory
 
-        bci = self.buffer_create_info.copy()
+        bci = self.buffer_create_info # todo: does this copy?
         bci.size = chunk_size
         buf = vk.vkCreateBuffer(self.device, bci, None)
         vk.vkBindBufferMemory(self.device, buf, mem, 0)
@@ -360,8 +365,8 @@ class VulkanContext:
         return VulkanChunk(mem, buf)
 
     def free_chunk(self, chunk: VulkanChunk) -> None:
-        vk.vkDestroyBuffer(chunk.buffer)
-        vk.vkFreeMemory(chunk.memory)
+        vk.vkDestroyBuffer(self.device, chunk.buffer, None)
+        vk.vkFreeMemory(self.device, chunk.memory, None)
 
     def suballocate(
         self, size: int, memory: int, allocator: Allocator
@@ -373,7 +378,26 @@ class VulkanContext:
             return self.free_chunk(chunk)
 
         allocation = allocator.allocate_split(size, alloc_chunk, free_chunk)
-        return VulkanSuballocation(self, allocation)
+        return VulkanSuballocation(self, allocator, allocation)
+
+    def subfree(self, suballocation: VulkanSuballocation) -> None:
+        self.delayed_free.append(
+            DelayedFree(
+                suballocation.allocator, suballocation.allocation, self.timeline_host
+            )
+        )
+
+    def maintain(self) -> None:
+        timeline_device = self.get_timeline_semaphore()
+
+        def free_if_ready(df: DelayedFree) -> bool:
+            if df.timeline <= timeline_device:
+                df.allocator.free_split(df.allocation, self.free_chunk)
+                return False
+            else:
+                return True
+
+        self.delayed_free = [df for df in self.delayed_free if free_if_ready(df)]
 
 
 @dataclass
@@ -382,16 +406,21 @@ class VulkanChunk:
     buffer: object  # vk.VkBuffer
 
 
+@dataclass
+class DelayedFree:
+    allocator: Allocator
+    allocation: list[Allocation]
+    timeline: int
+
+
+@dataclass
 class VulkanSuballocation:
-    def __init__(
-        self, vulkan_context: VulkanContext, allocation: list[Allocation]
-    ) -> None:
-        self.vulkan_context = vulkan_context
-        self.allocation = allocation
+    vulkan_context: VulkanContext
+    allocator: Allocator
+    allocation: list[Allocation]
 
     def __del__(self) -> None:
-        pass
-        # self.vulkan_context.delayed_free(self.allocation)
+        self.vulkan_context.subfree(self)
 
 
 # class VulkanContext:
