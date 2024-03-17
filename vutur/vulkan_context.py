@@ -60,10 +60,10 @@ class VulkanContext:
     memory_properties: vk.VkPhysicalDeviceMemoryProperties2
     buffer_create_info: vk.VkBufferCreateInfo
     buffer_requirements: vk.VkMemoryRequirements
-    host_memory: int
     device_memory: int
-    host_allocator: Allocator
-    device_allocator: Allocator
+    upload_memory: int
+    download_memory: int
+    allocators: dict[int, Allocator]
     timeline_semaphore: object  # vk.vkSemaphore
     timeline_host: int
     delayed_free: list[DelayedFree]
@@ -87,11 +87,12 @@ class VulkanContext:
         )
         self.create_commandpool()
         self.create_memories()
-        self.host_allocator = self.create_allocator(self.host_memory)
-        if self.host_memory == self.device_memory:
-            self.device_allocator = self.host_allocator
-        else:
-            self.device_allocator = self.create_allocator(self.device_memory)
+
+        self.allocators = {}
+        self.create_allocator(self.device_memory)
+        self.create_allocator(self.upload_memory)
+        self.create_allocator(self.download_memory)
+
         self.create_timeline_semaphore()
         self.delayed_free = []
 
@@ -281,6 +282,17 @@ class VulkanContext:
         self.commandpool = vk.vkCreateCommandPool(self.device, cpci, None)
 
     def create_memories(self) -> None:
+        """
+        Get three memory types, not necessarily different:
+        * Device-local memory
+        * Memory to use for uploading
+        * Memory to use for downloading
+
+        Common configurations are:
+        * Unified memory, e.g. integrated GPUs: all three are the same.
+        * Resizable BAR, e.g. modern discrete GPUs: device and upload are the same, download is separate.
+        * Separate, e.g. old discrete GPUs: all separate. The tiny "staging memory" is ignored.
+        """
         self.memory_properties = vk.VkPhysicalDeviceMemoryProperties2()
         vk.vkGetPhysicalDeviceMemoryProperties2(
             self.physicaldevice, self.memory_properties
@@ -300,26 +312,106 @@ class VulkanContext:
         vk.vkDestroyBuffer(self.device, temp_buffer, None)
 
         # see the documentation of VkPhysicalDeviceMemoryProperties for a detailed description.
-        def find_memory_type(bits: int, properties: int) -> int:
+        def find_memory_type(
+            bits: int, properties: int, heap: Optional[int]
+        ) -> Optional[int]:
             for i, mt in enumerate(self.memory_properties.memoryProperties.memoryTypes):
-                if bits & (1 << i) and (mt.propertyFlags & properties) == properties:
+                if (
+                    bits & (1 << i)
+                    and (mt.propertyFlags & properties) == properties
+                    and (heap is None or mt.heapIndex == heap)
+                ):
                     return i
-            raise ValueError(f"Can't find memory type for {bits=} {properties}")
+            return None
 
-        self.device_memory = find_memory_type(
+        default_device_memory = find_memory_type(
             self.buffer_requirements.memoryTypeBits,
             vk.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            None,
         )
-        self.host_memory = find_memory_type(
+        assert default_device_memory is not None  # guaranteed by spec
+        default_device_heap = self.memory_properties.memoryProperties.memoryTypes[
+            default_device_memory
+        ].heapIndex
+
+        default_host_memory = find_memory_type(
             self.buffer_requirements.memoryTypeBits,
             vk.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
             | vk.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            None,
+        )
+        assert default_host_memory is not None  # guaranteed by spec
+
+        device_upload_download_memory = find_memory_type(
+            self.buffer_requirements.memoryTypeBits,
+            vk.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+            default_device_heap,
+        )
+        device_upload_memory = find_memory_type(
+            self.buffer_requirements.memoryTypeBits,
+            vk.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            default_device_heap,
+        )
+        device_download_memory = find_memory_type(
+            self.buffer_requirements.memoryTypeBits,
+            vk.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+            default_device_heap,
+        )
+        host_download_memory = find_memory_type(
+            self.buffer_requirements.memoryTypeBits,
+            vk.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            | vk.VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+            None,
         )
 
-    def create_allocator(self, memtype: int) -> Allocator:
+        def notnone(li: list[Optional[int]]) -> int:
+            """Needed because using `or` would consider index 0 false"""
+            for e in li:
+                if e is not None:
+                    return e
+            assert False, li
+
+        self.device_memory = notnone(
+            [
+                device_upload_download_memory,
+                device_upload_memory,
+                device_download_memory,
+                default_device_memory,
+            ]
+        )
+        self.upload_memory = notnone(
+            [
+                device_upload_download_memory,
+                device_upload_memory,
+                default_host_memory,
+            ]
+        )
+        self.download_memory = notnone(
+            [
+                device_upload_download_memory,
+                device_download_memory,
+                host_download_memory,
+                default_host_memory,
+            ]
+        )
+        logging.debug(f"{self.device_memory=}")
+        logging.debug(f"{self.upload_memory=}")
+        logging.debug(f"{self.download_memory=}")
+
+    def create_allocator(self, memtype: int) -> None:
+        if memtype in self.allocators:
+            return
+
         props = self.memory_properties.memoryProperties.memoryTypes[memtype]
         heap = self.memory_properties.memoryProperties.memoryHeaps[props.heapIndex]
-        return Allocator(
+        self.allocators[memtype] = Allocator(
             alignment=self.buffer_requirements.alignment,
             max_memory=heap.size,
             max_contiguous_size=self.physicaldevice_properties.properties.limits.maxStorageBufferRange,
@@ -341,11 +433,8 @@ class VulkanContext:
         func = vk.vkGetInstanceProcAddr(self.instance, "vkGetSemaphoreCounterValueKHR")
         return func(self.device, self.timeline_semaphore)
 
-    def suballocate_host(self, size: int) -> VulkanSuballocation:
-        return self.suballocate(size, self.host_memory, self.host_allocator)
-
     def suballocate_device(self, size: int) -> VulkanSuballocation:
-        return self.suballocate(size, self.device_memory, self.device_allocator)
+        return self.suballocate(size, self.device_memory)
 
     def allocate_chunk(self, chunk_size: int, memory: int) -> VulkanChunk:
         mai = vk.VkMemoryAllocateInfo(
@@ -368,15 +457,14 @@ class VulkanContext:
         vk.vkDestroyBuffer(self.device, chunk.buffer, None)
         vk.vkFreeMemory(self.device, chunk.memory, None)
 
-    def suballocate(
-        self, size: int, memory: int, allocator: Allocator
-    ) -> VulkanSuballocation:
+    def suballocate(self, size: int, memory: int) -> VulkanSuballocation:
         def alloc_chunk(chunk_size: int) -> VulkanChunk:
             return self.allocate_chunk(chunk_size, memory)
 
         def free_chunk(chunk: VulkanChunk) -> None:
             return self.free_chunk(chunk)
 
+        allocator = self.allocators[memory]
         allocation = allocator.allocate_split(size, alloc_chunk, free_chunk)
         return VulkanSuballocation(self, allocator, allocation)
 
