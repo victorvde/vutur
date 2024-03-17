@@ -446,7 +446,7 @@ class VulkanContext:
         except (vk.VK_ERROR_OUT_OF_HOST_MEMORY, vk.VK_ERROR_OUT_OF_DEVICE_MEMORY):
             raise OutOfMemory
 
-        bci = self.buffer_create_info # todo: does this copy?
+        bci = self.buffer_create_info  # todo: does this copy?
         bci.size = chunk_size
         buf = vk.vkCreateBuffer(self.device, bci, None)
         vk.vkBindBufferMemory(self.device, buf, mem, 0)
