@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import os
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, Callable
 
 from vutur.allocator import Allocator, Allocation, OutOfMemory
 
@@ -30,7 +30,9 @@ def filter_set(available: set[str], optional: set[str], required: set[str]) -> s
     return available & (optional | required)
 
 
-def debug_callback(severity: int, messagetype: int, data: Any, _userdata: Any) -> bool:
+def debug_callback(
+    severity: int, messagetype: int, data: Any, _userdata: object
+) -> bool:
     message = f"VK [{cs(data.pMessageIdName)}] [{cs(data.pMessage)}]"
     if severity & vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
         logging.error(message)
@@ -56,7 +58,7 @@ class VulkanContext:
     queuefamily: int
     device: object  # vk.VkDevice
     queue: object  # vk.VkQueue
-    commandpool: object  # vk.vkCommandPool
+    commandpool_pool: list[object]  # list[vk.vkCommandPool]
     memory_properties: vk.VkPhysicalDeviceMemoryProperties2
     buffer_create_info: vk.VkBufferCreateInfo
     buffer_requirements: vk.VkMemoryRequirements
@@ -66,7 +68,7 @@ class VulkanContext:
     allocators: dict[int, Allocator]
     timeline_semaphore: object  # vk.vkSemaphore
     timeline_host: int
-    delayed_free: list[DelayedFree]
+    delayed: list[Delayed]
 
     def __init__(self, device_filter: Optional[str] = None) -> None:
         if device_filter is None:
@@ -85,7 +87,7 @@ class VulkanContext:
             opt_extensions=set(),
             req_extensions={vk.VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME},
         )
-        self.create_commandpool()
+        self.commandpool_pool = []
         self.create_memories()
 
         self.allocators = {}
@@ -94,17 +96,18 @@ class VulkanContext:
         self.create_allocator(self.download_memory)
 
         self.create_timeline_semaphore()
-        self.delayed_free = []
+        self.delayed = []
 
     def __del__(self) -> None:
-        if hasattr(self, "delayed_free"):
+        if hasattr(self, "delayed"):
             vk.vkDeviceWaitIdle(self.device)
             self.maintain()
-            assert len(self.delayed_free) == 0, self.delayed_free
+            assert len(self.delayed) == 0, self.delayed
         if hasattr(self, "timeline_semaphore"):
             vk.vkDestroySemaphore(self.device, self.timeline_semaphore, None)
-        if hasattr(self, "commandpool"):
-            vk.vkDestroyCommandPool(self.device, self.commandpool, None)
+        if hasattr(self, "commandpool_pool"):
+            for commandpool in self.commandpool_pool:
+                vk.vkDestroyCommandPool(self.device, commandpool, None)
         if hasattr(self, "debug_callback"):
             func = vk.vkGetInstanceProcAddr(
                 self.instance, "vkDestroyDebugUtilsMessengerEXT"
@@ -273,13 +276,25 @@ class VulkanContext:
         self.device = vk.vkCreateDevice(self.physicaldevice, dci, None)
         self.queue = vk.vkGetDeviceQueue(self.device, self.queuefamily, 0)
 
-    def create_commandpool(self) -> None:
+    def get_commandpool(self) -> object:
+        if len(self.commandpool_pool) > 0:
+            return self.commandpool_pool.pop()
+
         cpci = vk.VkCommandPoolCreateInfo(
-            flags=0,
+            flags=vk.VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
             queueFamilyIndex=self.queuefamily,
         )
 
-        self.commandpool = vk.vkCreateCommandPool(self.device, cpci, None)
+        return vk.vkCreateCommandPool(self.device, cpci, None)
+
+    def release_commandpool(self, commandpool: object) -> None:
+        def run() -> None:
+            vk.vkResetCommandPool(
+                self.device, commandpool, vk.VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT
+            )
+            self.commandpool_pool.append(commandpool)
+
+        self.delayed.append(Delayed(self.timeline_host, run))
 
     def create_memories(self) -> None:
         """
@@ -436,10 +451,10 @@ class VulkanContext:
     def suballocate_device(self, size: int) -> VulkanSuballocation:
         return self.suballocate(size, self.device_memory)
 
-    def allocate_chunk(self, chunk_size: int, memory: int) -> VulkanChunk:
+    def allocate_chunk(self, chunk_size: int, memtype: int) -> VulkanChunk:
         mai = vk.VkMemoryAllocateInfo(
             allocationSize=chunk_size,
-            memoryTypeIndex=memory,
+            memoryTypeIndex=memtype,
         )
         try:
             mem = vk.vkAllocateMemory(self.device, mai, None)
@@ -451,58 +466,101 @@ class VulkanContext:
         buf = vk.vkCreateBuffer(self.device, bci, None)
         vk.vkBindBufferMemory(self.device, buf, mem, 0)
 
-        return VulkanChunk(mem, buf)
+        if memtype in (self.upload_memory, self.download_memory):
+            mapping = vk.vkMapMemory(self.device, mem, 0, chunk_size, 0)
+        else:
+            mapping = None
+
+        return VulkanChunk(mem, buf, mapping)
 
     def free_chunk(self, chunk: VulkanChunk) -> None:
         vk.vkDestroyBuffer(self.device, chunk.buffer, None)
-        vk.vkFreeMemory(self.device, chunk.memory, None)
+        if chunk.mapping is not None:
+            vk.vkUnmapMemory(self.device, chunk.mem)
+        vk.vkFreeMemory(self.device, chunk.mem, None)
 
-    def suballocate(self, size: int, memory: int) -> VulkanSuballocation:
+    def suballocate(self, size: int, memtype: int) -> VulkanSuballocation:
         def alloc_chunk(chunk_size: int) -> VulkanChunk:
-            return self.allocate_chunk(chunk_size, memory)
+            return self.allocate_chunk(chunk_size, memtype)
 
         def free_chunk(chunk: VulkanChunk) -> None:
             return self.free_chunk(chunk)
 
-        allocator = self.allocators[memory]
+        allocator = self.allocators[memtype]
         allocation = allocator.allocate_split(size, alloc_chunk, free_chunk)
-        return VulkanSuballocation(self, allocator, allocation)
+        return VulkanSuballocation(size, memtype, self, allocator, allocation)
 
     def subfree(self, suballocation: VulkanSuballocation) -> None:
-        self.delayed_free.append(
-            DelayedFree(
-                suballocation.allocator, suballocation.allocation, self.timeline_host
+        def run() -> None:
+            suballocation.allocator.free_split(
+                suballocation.allocation, self.free_chunk
             )
-        )
+
+        self.delayed.append(Delayed(self.timeline_host, run))
+
+    def upload(self, suballocation: VulkanSuballocation, src: memoryview) -> None:
+        if suballocation.memtype != self.upload_memory:
+            upload_allocation = self.suballocate(suballocation.size, self.upload_memory)
+        else:
+            upload_allocation = suballocation
+
+        srcoffset = 0
+        for s in upload_allocation.allocation:
+            assert isinstance(s.chunk, VulkanChunk)
+            assert s.chunk.mapping is not None
+            dest = s.chunk.mapping + s.offset
+            vk.ffi.memmove(dest, src[srcoffset:], s.size)
+            srcoffset += s.size
+
+        if suballocation.memtype != self.upload_memory:
+            commandpool = self.get_commandpool()
+            # commandbuffer = self.get_commandbuffer(commandpool)
+
+            # vk.vkCmdCopyBuffer(
+            #     commandbuffer,
+            #     suballocation...
+            #     upload_allocation...,
+            #     ...
+            # )
+            # vk.vkSubmit(...)
+
+            self.release_commandpool(commandpool)
+
+            self.subfree(upload_allocation)
+
+    def download(self, suballocation: VulkanSuballocation) -> memoryview:
+        raise NotImplementedError
 
     def maintain(self) -> None:
         timeline_device = self.get_timeline_semaphore()
 
-        def free_if_ready(df: DelayedFree) -> bool:
-            if df.timeline <= timeline_device:
-                df.allocator.free_split(df.allocation, self.free_chunk)
+        def run_if_ready(d: Delayed) -> bool:
+            if d.timeline <= timeline_device:
+                d.run()
                 return False
             else:
                 return True
 
-        self.delayed_free = [df for df in self.delayed_free if free_if_ready(df)]
+        self.delayed = [df for df in self.delayed if run_if_ready(df)]
 
 
 @dataclass
 class VulkanChunk:
-    memory: object  # vk.VkAllocation
+    mem: object  # vk.VkAllocation
     buffer: object  # vk.VkBuffer
+    mapping: Optional[Any]  # todo proper type # void*
 
 
 @dataclass
-class DelayedFree:
-    allocator: Allocator
-    allocation: list[Allocation]
+class Delayed:
     timeline: int
+    run: Callable[[], None]
 
 
 @dataclass
 class VulkanSuballocation:
+    size: int
+    memtype: int
     vulkan_context: VulkanContext
     allocator: Allocator
     allocation: list[Allocation]
