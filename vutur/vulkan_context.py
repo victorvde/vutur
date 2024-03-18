@@ -276,26 +276,6 @@ class VulkanContext:
         self.device = vk.vkCreateDevice(self.physicaldevice, dci, None)
         self.queue = vk.vkGetDeviceQueue(self.device, self.queuefamily, 0)
 
-    def get_commandpool(self) -> object:
-        if len(self.commandpool_pool) > 0:
-            return self.commandpool_pool.pop()
-
-        cpci = vk.VkCommandPoolCreateInfo(
-            flags=vk.VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
-            queueFamilyIndex=self.queuefamily,
-        )
-
-        return vk.vkCreateCommandPool(self.device, cpci, None)
-
-    def release_commandpool(self, commandpool: object) -> None:
-        def run() -> None:
-            vk.vkResetCommandPool(
-                self.device, commandpool, vk.VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT
-            )
-            self.commandpool_pool.append(commandpool)
-
-        self.delayed.append(Delayed(self.timeline_host, run))
-
     def create_memories(self) -> None:
         """
         Get three memory types, not necessarily different:
@@ -498,6 +478,42 @@ class VulkanContext:
 
         self.delayed.append(Delayed(self.timeline_host, run))
 
+    def get_commandpool(self) -> object:
+        if len(self.commandpool_pool) > 0:
+            return self.commandpool_pool.pop()
+
+        cpci = vk.VkCommandPoolCreateInfo(
+            flags=vk.VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
+            queueFamilyIndex=self.queuefamily,
+        )
+
+        return vk.vkCreateCommandPool(self.device, cpci, None)
+
+    def release_commandpool(self, commandpool: object) -> None:
+        def run() -> None:
+            vk.vkResetCommandPool(
+                self.device, commandpool, vk.VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT
+            )
+            self.commandpool_pool.append(commandpool)
+
+        self.delayed.append(Delayed(self.timeline_host, run))
+
+    def get_commandbuffer(self, commandpool: object) -> object:
+        cbai = vk.VkCommandBufferAllocateInfo(
+            commandpool=commandpool,
+            level=vk.VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+            commandBufferCount=1,
+        )
+
+        cb = vk.vkAllocateCommandBuffers(self.device, cbai)
+
+        cbbi = vk.VkCommandBufferBeginInfo(
+            VkCommandBufferUsageFlags=vk.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+        )
+
+        vk.vkBeginCommandBuffer(cb, cbbi)
+        return cb
+
     def upload(self, suballocation: VulkanSuballocation, src: memoryview) -> None:
         if suballocation.memtype != self.upload_memory:
             upload_allocation = self.suballocate(suballocation.size, self.upload_memory)
@@ -525,7 +541,6 @@ class VulkanContext:
             # vk.vkSubmit(...)
 
             self.release_commandpool(commandpool)
-
             self.subfree(upload_allocation)
 
     def download(self, suballocation: VulkanSuballocation) -> memoryview:
