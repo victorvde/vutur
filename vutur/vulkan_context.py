@@ -514,8 +514,77 @@ class VulkanContext:
         vk.vkBeginCommandBuffer(cb, cbbi)
         return cb
 
+    def copy_allocation(
+        self, src: VulkanSuballocation, dst: VulkanSuballocation
+    ) -> None:
+        assert src.size == dst.size, (src.size, dst.size)
+
+        commandpool = self.get_commandpool()
+        commandbuffer = self.get_commandbuffer(commandpool)
+
+        srci = 0
+        srcoffset = 0
+        dsti = 0
+        dstoffset = 0
+        while True:
+            srca = src.allocation[srci]
+            srcsize = srca.size
+            dsta = dst.allocation[dsti]
+            dstsize = dsta.size
+            copysize = min(srcsize, dstsize)
+
+            region = vk.vkBufferCopy(
+                srcOffset=srca.offset + srcoffset,
+                dstOffset=dsta.offset + dstoffset,
+                size=copysize,
+            )
+
+            assert isinstance(srca.chunk, VulkanChunk)
+            assert isinstance(dsta.chunk, VulkanChunk)
+
+            vk.vkCmdCopyBuffer(
+                commandbuffer,
+                srca.chunk.buffer,
+                dsta.chunk.buffer,
+                1,
+                [region],
+            )
+
+        waitsemaphore = vk.VkSemaphoreSubmitInfo(
+            semaphore=self.timeline_semaphore,
+            value=self.timeline_host,
+            stageMask=vk.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
+        )
+        signalsemaphore = vk.VkSemaphoreSubmitInfo(
+            semaphore=self.timeline_semaphore,
+            value=self.timeline_host + 1,
+            stageMask=vk.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
+        )
+
+        si2 = vk.vkSubmitInfo2(
+            waitSemaphoreInfoCount=1,
+            pWaitSemaphoreInfos=[waitsemaphore],
+            commandBufferInfoCount=1,
+            pCommandBufferInfos=[commandbuffer],
+            signalSemaphoreInfoCount=1,
+            pSignalSemaphoreInfos=[signalsemaphore],
+        )
+
+        func = vk.vkGetInstanceProcAddr(self.instance, "vkQueueSubmit2KHR")
+        func(
+            self.queue,
+            1,
+            [si2],
+            None,
+        )
+        self.timeline_host += 1
+        self.release_commandpool(commandpool)
+
     def upload(self, suballocation: VulkanSuballocation, src: memoryview) -> None:
-        if suballocation.memtype != self.upload_memory:
+        assert src.nbytes == suballocation.size, (src.nbytes, suballocation.size)
+
+        use_staging = suballocation.memtype != self.upload_memory
+        if use_staging:
             upload_allocation = self.suballocate(suballocation.size, self.upload_memory)
         else:
             upload_allocation = suballocation
@@ -528,23 +597,12 @@ class VulkanContext:
             vk.ffi.memmove(dest, src[srcoffset:], s.size)
             srcoffset += s.size
 
-        if suballocation.memtype != self.upload_memory:
-            commandpool = self.get_commandpool()
-            # commandbuffer = self.get_commandbuffer(commandpool)
-
-            # vk.vkCmdCopyBuffer(
-            #     commandbuffer,
-            #     suballocation...
-            #     upload_allocation...,
-            #     ...
-            # )
-            # vk.vkSubmit(...)
-
-            self.release_commandpool(commandpool)
+        if use_staging:
+            self.copy_allocation(upload_allocation, suballocation)
             self.subfree(upload_allocation)
 
-    def download(self, suballocation: VulkanSuballocation) -> memoryview:
-        raise NotImplementedError
+    def download(self, suballocation: VulkanSuballocation) -> None:
+        ...
 
     def maintain(self) -> None:
         timeline_device = self.get_timeline_semaphore()
