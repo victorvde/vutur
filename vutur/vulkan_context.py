@@ -16,9 +16,16 @@ DEBUG_LAYER = "VK_LAYER_KHRONOS_validation"
 DEBUG_EXTENSION = "VK_EXT_debug_utils"
 
 
+__all__ = [
+    "VulkanContext",
+    "VulkanChunk",
+    "VulkanSuballocation",
+]
+
+
 # utils
 def cs(c: object) -> str:
-    """Convert vulkan ffi string to str"""
+    """Convert vulkan ffi string to str."""
     return vk.ffi.string(c).decode()
 
 
@@ -33,6 +40,7 @@ def filter_set(available: set[str], optional: set[str], required: set[str]) -> s
 def debug_callback(
     severity: int, messagetype: int, data: Any, _userdata: object
 ) -> bool:
+    """Forward debug layer messages to logging."""
     message = f"VK [{cs(data.pMessageIdName)}] [{cs(data.pMessage)}]"
     if severity & vk.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
         logging.error(message)
@@ -48,7 +56,13 @@ def debug_callback(
 
 
 class VulkanContext:
+    """
+    Everything related to a Vulkan instance (device, queue etc).
+    """
+
     destroyed: bool
+    """See `destroy`."""
+
     instance: object  # vk.VkInstance
     layers: set[str]
     extensions: set[str]
@@ -74,6 +88,12 @@ class VulkanContext:
     def __init__(
         self, device_filter: Optional[str] = None, prefer_separate_memory: bool = False
     ) -> None:
+        """
+        Arguments:
+        * `device_filter`: optional substring for the device to select.
+          Can also be specified with the VUTUR_DEVICE environment variable.
+        * `prefer_separate_memory`: don't use unified memory, mostly for testing purposes.
+        """
         self.destroyed = False
 
         if device_filter is None:
@@ -107,6 +127,7 @@ class VulkanContext:
         self.delayed = []
 
     def destroy(self) -> None:
+        """Clean up, automatically called from `___del___`."""
         if self.destroyed:
             return
 
@@ -143,6 +164,15 @@ class VulkanContext:
         opt_extensions: set[str],
         req_extensions: set[str],
     ) -> None:
+        """
+        @private Part of __init__.
+        Arguments:
+        * version: required Vulkan version.
+        * opt_Layers: optional Vulkan layers.
+        * req_layers: required Vulkan layers.
+        * opt_extensions: optional Vulkan extensions.
+        * req_extensions: required Vulkan extensions.
+        """
         available_layers = {
             prop.layerName for prop in vk.vkEnumerateInstanceLayerProperties()
         }
@@ -185,6 +215,9 @@ class VulkanContext:
         self.instance = vk.vkCreateInstance(createInfo, None)
 
     def create_debug_callback(self) -> None:
+        """
+        @private Part of __init__.
+        """
         if DEBUG_EXTENSION in self.extensions:
             func = vk.vkGetInstanceProcAddr(
                 self.instance, "vkCreateDebugUtilsMessengerEXT"
@@ -205,6 +238,9 @@ class VulkanContext:
             self.debug_callback = func(self.instance, cb, None)
 
     def create_physical_device(self, device_filter: str) -> None:
+        """
+        @private Part of __init__.
+        """
         physical_devices = vk.vkEnumeratePhysicalDevices(self.instance)
         physical_devices_with = []
         for pd in physical_devices:
@@ -245,6 +281,12 @@ class VulkanContext:
         logging.info(f"Selected device {selected_name}")
 
     def create_device(self, opt_extensions: set[str], req_extensions: set[str]) -> None:
+        """
+        @private Part of __init__.
+        Arguments:
+        * opt_extensions: optional Vulkan extensions.
+        * req_extensions: required Vulkan extensions.
+        """
         available_device_extensions = {
             e.extensionName
             for e in vk.vkEnumerateDeviceExtensionProperties(self.physicaldevice, None)
@@ -298,6 +340,7 @@ class VulkanContext:
 
     def create_memories(self, prefer_separate_memory: bool) -> None:
         """
+        @private Part of __init__.
         Get three memory types, not necessarily different:
         * Device-local memory
         * Memory to use for uploading
@@ -309,7 +352,7 @@ class VulkanContext:
         * Separate, e.g. old discrete GPUs: all separate. The tiny "staging memory" is ignored.
 
         Arguments:
-        * `prefer_separate_memory: don't use host-mappable device memory (UMA/ReBAR) even if available.
+        * `prefer_separate_memory`: don't use host-mappable device memory (UMA/ReBAR) even if available.
         """
         self.memory_properties = vk.VkPhysicalDeviceMemoryProperties2()
         vk.vkGetPhysicalDeviceMemoryProperties2(
@@ -431,6 +474,9 @@ class VulkanContext:
         logging.debug(f"{self.download_memory=}")
 
     def create_allocator(self, memtype: int) -> None:
+        """
+        @private Part of __init__.
+        """
         if memtype in self.allocators:
             return
 
@@ -444,6 +490,9 @@ class VulkanContext:
         )
 
     def create_timeline_semaphore(self) -> None:
+        """
+        @private Part of __init__.
+        """
         stci = vk.VkSemaphoreTypeCreateInfo(
             semaphoreType=vk.VK_SEMAPHORE_TYPE_TIMELINE,
             initialValue=0,
@@ -455,13 +504,24 @@ class VulkanContext:
         self.timeline_host = 0
 
     def get_timeline_semaphore(self) -> int:
+        """
+        Get the current value of the timeline semaphore (device timeline).
+        """
         func = vk.vkGetDeviceProcAddr(self.device, "vkGetSemaphoreCounterValueKHR")
         return func(self.device, self.timeline_semaphore)
 
     def suballocate_device(self, size: int) -> VulkanSuballocation:
+        """
+        Allocate on the device.
+
+        Can raise `OutofMemory`.
+        """
         return self.suballocate(size, self.device_memory)
 
     def allocate_chunk(self, chunk_size: int, memtype: int) -> VulkanChunk:
+        """
+        @private Create a Vulkan allocation, called by the suballocators.
+        """
         mai = vk.VkMemoryAllocateInfo(
             allocationSize=chunk_size,
             memoryTypeIndex=memtype,
@@ -484,12 +544,18 @@ class VulkanContext:
         return VulkanChunk(mem, buf, mapping)
 
     def free_chunk(self, chunk: VulkanChunk) -> None:
+        """
+        @private Free a Vulkan allocation, called by the suballocators.
+        """
         vk.vkDestroyBuffer(self.device, chunk.buffer, None)
         if chunk.mapping is not None:
             vk.vkUnmapMemory(self.device, chunk.mem)
         vk.vkFreeMemory(self.device, chunk.mem, None)
 
     def suballocate(self, size: int, memtype: int) -> VulkanSuballocation:
+        """
+        @private Create a Vulkan allocation on whatever memory type.
+        """
         assert not self.destroyed
 
         def alloc_chunk(chunk_size: int) -> VulkanChunk:
@@ -503,6 +569,9 @@ class VulkanContext:
         return VulkanSuballocation(size, memtype, self, allocator, allocation)
 
     def subfree(self, suballocation: VulkanSuballocation) -> None:
+        """
+        Free a Vulkan suballocation.
+        """
         assert not self.destroyed
 
         def run() -> None:
@@ -513,6 +582,9 @@ class VulkanContext:
         self.delayed.append(Delayed(self.timeline_host, run))
 
     def get_commandpool(self) -> object:
+        """
+        @private Get a Vulkan command pool from the command pool pool.
+        """
         if len(self.commandpool_pool) > 0:
             return self.commandpool_pool.pop()
 
@@ -524,6 +596,10 @@ class VulkanContext:
         return vk.vkCreateCommandPool(self.device, cpci, None)
 
     def release_commandpool(self, commandpool: object) -> None:
+        """
+        @private Release a Vulkan command pool back to the command pool pool.
+        """
+
         def run() -> None:
             vk.vkResetCommandPool(
                 self.device, commandpool, vk.VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT
@@ -533,6 +609,9 @@ class VulkanContext:
         self.delayed.append(Delayed(self.timeline_host, run))
 
     def get_commandbuffer(self, commandpool: object) -> object:
+        """
+        @private Allocate and begin a Vulkan command buffer from a command pool.
+        """
         cbai = vk.VkCommandBufferAllocateInfo(
             commandPool=commandpool,
             level=vk.VK_COMMAND_BUFFER_LEVEL_PRIMARY,
@@ -549,6 +628,9 @@ class VulkanContext:
         return cb
 
     def submit_commandbuffer(self, commandbuffer: object) -> None:
+        """
+        @private End and submit a Vulkan command buffer, including timeline management.
+        """
         vk.vkEndCommandBuffer(commandbuffer)
 
         waitsemaphore = vk.VkSemaphoreSubmitInfo(
@@ -586,6 +668,9 @@ class VulkanContext:
     def copy_allocation(
         self, src: VulkanSuballocation, dst: VulkanSuballocation
     ) -> None:
+        """
+        @private Copy from one Vulkan suballocation to another (asynchronous).
+        """
         assert src.size == dst.size, (src.size, dst.size)
 
         commandpool = self.get_commandpool()
@@ -636,6 +721,9 @@ class VulkanContext:
     def upload(
         self, suballocation: VulkanSuballocation, src: Union[bytes, bytearray]
     ) -> None:
+        """
+        Upload bytes to a Vulkan suballocation (asynchronous).
+        """
         assert not self.destroyed
 
         self.maintain()
@@ -664,6 +752,9 @@ class VulkanContext:
             upload_allocation.destroy()
 
     def download(self, suballocation: VulkanSuballocation) -> bytearray:
+        """
+        Download a Vulkan suballocation to a bytearray (synchronous).
+        """
         assert not self.destroyed
 
         self.maintain()
@@ -704,6 +795,9 @@ class VulkanContext:
         return dst
 
     def maintain(self) -> None:
+        """
+        @private Perform any delayed clean-up once the device is done.
+        """
         timeline_device = self.get_timeline_semaphore()
 
         def run_if_ready(d: Delayed) -> bool:
@@ -718,6 +812,10 @@ class VulkanContext:
 
 @dataclass
 class VulkanChunk:
+    """
+    Vulkan allocation, buffer, and host memory mapping (if available)
+    """
+
     mem: object  # vk.VkAllocation
     buffer: object  # vk.VkBuffer
     mapping: Optional[Any]  # todo proper type # void*
@@ -725,12 +823,20 @@ class VulkanChunk:
 
 @dataclass
 class Delayed:
+    """
+    Clean-up that needs to `run()` after the timeline semaphore hits timeline.
+    """
+
     timeline: int
     run: Callable[[], None]
 
 
 @dataclass
 class VulkanSuballocation:
+    """
+    Vulkan memory suballocation either on the device or the host.
+    """
+
     size: int
     memtype: int
     vulkan_context: VulkanContext
@@ -739,6 +845,8 @@ class VulkanSuballocation:
     destroyed: bool = field(default=False)
 
     def destroy(self) -> None:
+        """Clean up, automatically called from `___del___`."""
+
         if self.destroyed:
             return
 
