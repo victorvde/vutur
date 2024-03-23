@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import os
 import logging
-from typing import Any, Optional, Callable
+from typing import Any, Optional, Callable, Union
 
 from vutur.allocator import Allocator, Allocation, OutOfMemory
 
@@ -631,8 +631,14 @@ class VulkanContext:
         self.timeline_host += 1
         self.release_commandpool(commandpool)
 
-    def upload(self, suballocation: VulkanSuballocation, src: memoryview) -> None:
+    def upload(
+        self, suballocation: VulkanSuballocation, src: Union[bytes, bytearray]
+    ) -> None:
         assert not self.destroyed
+
+        self.maintain()
+
+        src = memoryview(src)
         assert src.nbytes == suballocation.size, (src.nbytes, suballocation.size)
 
         use_staging = suballocation.memtype != self.upload_memory
@@ -649,15 +655,51 @@ class VulkanContext:
             s.chunk.mapping[s.offset : s.offset + copysize] = src[
                 srcoffset : srcoffset + copysize
             ]
-            srcoffset += s.size
+            srcoffset += copysize
 
         if use_staging:
             self.copy_allocation(upload_allocation, suballocation)
             upload_allocation.destroy()
 
-    def download(self, suballocation: VulkanSuballocation) -> None:
+    def download(self, suballocation: VulkanSuballocation) -> bytearray:
         assert not self.destroyed
-        ...
+
+        self.maintain()
+
+        use_staging = suballocation.memtype != self.download_memory
+        if use_staging:
+            download_allocation = self.suballocate(
+                suballocation.size, self.download_memory
+            )
+            self.copy_allocation(suballocation, download_allocation)
+        else:
+            download_allocation = suballocation
+
+        smwi = vk.VkSemaphoreWaitInfo(
+            semaphoreCount=1,
+            pSemaphores=[self.timeline_semaphore],
+            pValues=[self.timeline_host],
+        )
+        func = vk.vkGetDeviceProcAddr(self.device, "vkWaitSemaphoresKHR")
+        func(self.device, smwi, 5_000_000_000)
+        self.maintain()
+
+        dst = bytearray(suballocation.size)
+        dstoffset = 0
+        for s in download_allocation.allocation:
+            assert isinstance(s.chunk, VulkanChunk)
+            assert s.chunk.mapping is not None
+            copysize = min(suballocation.size - dstoffset, s.size)
+            dst[dstoffset : dstoffset + copysize] = s.chunk.mapping[
+                s.offset : s.offset + copysize
+            ]
+            dstoffset += copysize
+
+        if use_staging:
+            download_allocation.destroy()
+        self.maintain()
+
+        return dst
 
     def maintain(self) -> None:
         timeline_device = self.get_timeline_semaphore()
