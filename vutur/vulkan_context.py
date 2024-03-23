@@ -653,7 +653,7 @@ class VulkanContext:
 
         if use_staging:
             self.copy_allocation(upload_allocation, suballocation)
-            self.subfree(upload_allocation)
+            upload_allocation.destroy()
 
     def download(self, suballocation: VulkanSuballocation) -> None:
         assert not self.destroyed
