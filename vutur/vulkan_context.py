@@ -90,7 +90,10 @@ class VulkanContext:
         self.create_physical_device(device_filter)
         self.create_device(
             opt_extensions=set(),
-            req_extensions={vk.VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME},
+            req_extensions={
+                vk.VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+                vk.VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+            },
         )
         self.commandpool_pool = []
         self.create_memories(prefer_separate_memory)
@@ -270,7 +273,11 @@ class VulkanContext:
             ],  # we only have one queue, so this is not that imporant.
         )
 
+        synchronization2features = vk.VkPhysicalDeviceSynchronization2Features(
+            synchronization2=True,
+        )
         timelineFeatures = vk.VkPhysicalDeviceTimelineSemaphoreFeatures(
+            pNext=synchronization2features,
             timelineSemaphore=True,
         )
         deviceFeatures = vk.VkPhysicalDeviceFeatures2(
@@ -448,7 +455,7 @@ class VulkanContext:
         self.timeline_host = 0
 
     def get_timeline_semaphore(self) -> int:
-        func = vk.vkGetInstanceProcAddr(self.instance, "vkGetSemaphoreCounterValueKHR")
+        func = vk.vkGetDeviceProcAddr(self.device, "vkGetSemaphoreCounterValueKHR")
         return func(self.device, self.timeline_semaphore)
 
     def suballocate_device(self, size: int) -> VulkanSuballocation:
@@ -527,15 +534,15 @@ class VulkanContext:
 
     def get_commandbuffer(self, commandpool: object) -> object:
         cbai = vk.VkCommandBufferAllocateInfo(
-            commandpool=commandpool,
+            commandPool=commandpool,
             level=vk.VK_COMMAND_BUFFER_LEVEL_PRIMARY,
             commandBufferCount=1,
         )
 
-        cb = vk.vkAllocateCommandBuffers(self.device, cbai)
+        cb = vk.vkAllocateCommandBuffers(self.device, cbai)[0]
 
         cbbi = vk.VkCommandBufferBeginInfo(
-            VkCommandBufferUsageFlags=vk.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+            flags=vk.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
         )
 
         vk.vkBeginCommandBuffer(cb, cbbi)
@@ -587,23 +594,27 @@ class VulkanContext:
             value=self.timeline_host + 1,
             stageMask=vk.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
         )
+        cbsi = vk.VkCommandBufferSubmitInfo(
+            commandBuffer=commandbuffer,
+        )
 
-        si2 = vk.vkSubmitInfo2(
+        si2 = vk.VkSubmitInfo2(
             waitSemaphoreInfoCount=1,
             pWaitSemaphoreInfos=[waitsemaphore],
             commandBufferInfoCount=1,
-            pCommandBufferInfos=[commandbuffer],
+            pCommandBufferInfos=[cbsi],
             signalSemaphoreInfoCount=1,
             pSignalSemaphoreInfos=[signalsemaphore],
         )
 
-        func = vk.vkGetInstanceProcAddr(self.instance, "vkQueueSubmit2KHR")
+        func = vk.vkGetDeviceProcAddr(self.device, "vkQueueSubmit2KHR")
         func(
             self.queue,
             1,
             [si2],
-            None,
+            0,
         )
+
         self.timeline_host += 1
         self.release_commandpool(commandpool)
 
