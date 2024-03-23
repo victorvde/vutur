@@ -2,6 +2,7 @@ from vutur.vulkan_context import VulkanContext
 
 import pytest
 
+
 def test_init() -> None:
     with pytest.raises(ValueError):
         c = VulkanContext("this device does not exist")
@@ -18,11 +19,12 @@ def test_alloc() -> None:
 
 
 def test_upload() -> None:
-    c = VulkanContext()
-    d = c.suballocate_device(100)
+    for seperate in [False, True]:
+        c = VulkanContext(prefer_separate_memory=seperate)
+        d = c.suballocate_device(100)
 
-    data = bytearray(100)
-    c.upload(d, memoryview(data))
+        data = bytearray(100)
+        c.upload(d, memoryview(data))
 
-    del c
-    del d
+        d.destroy()
+        c.destroy()

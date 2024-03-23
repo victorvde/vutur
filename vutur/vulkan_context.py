@@ -71,7 +71,9 @@ class VulkanContext:
     timeline_host: int
     delayed: list[Delayed]
 
-    def __init__(self, device_filter: Optional[str] = None) -> None:
+    def __init__(
+        self, device_filter: Optional[str] = None, prefer_separate_memory: bool = False
+    ) -> None:
         self.destroyed = False
 
         if device_filter is None:
@@ -91,7 +93,7 @@ class VulkanContext:
             req_extensions={vk.VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME},
         )
         self.commandpool_pool = []
-        self.create_memories()
+        self.create_memories(prefer_separate_memory)
 
         self.allocators = {}
         self.create_allocator(self.device_memory)
@@ -287,7 +289,7 @@ class VulkanContext:
         self.device = vk.vkCreateDevice(self.physicaldevice, dci, None)
         self.queue = vk.vkGetDeviceQueue(self.device, self.queuefamily, 0)
 
-    def create_memories(self) -> None:
+    def create_memories(self, prefer_separate_memory: bool) -> None:
         """
         Get three memory types, not necessarily different:
         * Device-local memory
@@ -298,6 +300,9 @@ class VulkanContext:
         * Unified memory, e.g. integrated GPUs: all three are the same.
         * Resizable BAR, e.g. modern discrete GPUs: device and upload are the same, download is separate.
         * Separate, e.g. old discrete GPUs: all separate. The tiny "staging memory" is ignored.
+
+        Arguments:
+        * `prefer_separate_memory: don't use host-mappable device memory (UMA/ReBAR) even if available.
         """
         self.memory_properties = vk.VkPhysicalDeviceMemoryProperties2()
         vk.vkGetPhysicalDeviceMemoryProperties2(
@@ -336,9 +341,6 @@ class VulkanContext:
             None,
         )
         assert default_device_memory is not None  # guaranteed by spec
-        default_device_heap = self.memory_properties.memoryProperties.memoryTypes[
-            default_device_memory
-        ].heapIndex
 
         default_host_memory = find_memory_type(
             self.buffer_requirements.memoryTypeBits,
@@ -347,6 +349,16 @@ class VulkanContext:
             None,
         )
         assert default_host_memory is not None  # guaranteed by spec
+
+        if prefer_separate_memory:
+            self.device_memory = default_device_memory
+            self.upload_memory = default_host_memory
+            self.download_memory = default_host_memory
+            return
+
+        default_device_heap = self.memory_properties.memoryProperties.memoryTypes[
+            default_device_memory
+        ].heapIndex
 
         device_upload_download_memory = find_memory_type(
             self.buffer_requirements.memoryTypeBits,
