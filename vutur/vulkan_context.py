@@ -548,6 +548,41 @@ class VulkanContext:
         vk.vkBeginCommandBuffer(cb, cbbi)
         return cb
 
+    def submit_commandbuffer(self, commandbuffer: object) -> None:
+        vk.vkEndCommandBuffer(commandbuffer)
+
+        waitsemaphore = vk.VkSemaphoreSubmitInfo(
+            semaphore=self.timeline_semaphore,
+            value=self.timeline_host,
+            stageMask=vk.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
+        )
+        signalsemaphore = vk.VkSemaphoreSubmitInfo(
+            semaphore=self.timeline_semaphore,
+            value=self.timeline_host + 1,
+            stageMask=vk.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
+        )
+        cbsi = vk.VkCommandBufferSubmitInfo(
+            commandBuffer=commandbuffer,
+        )
+
+        si2 = vk.VkSubmitInfo2(
+            waitSemaphoreInfoCount=1,
+            pWaitSemaphoreInfos=[waitsemaphore],
+            commandBufferInfoCount=1,
+            pCommandBufferInfos=[cbsi],
+            signalSemaphoreInfoCount=1,
+            pSignalSemaphoreInfos=[signalsemaphore],
+        )
+
+        func = vk.vkGetDeviceProcAddr(self.device, "vkQueueSubmit2KHR")
+        func(
+            self.queue,
+            1,
+            [si2],
+            0,
+        )
+        self.timeline_host += 1
+
     def copy_allocation(
         self, src: VulkanSuballocation, dst: VulkanSuballocation
     ) -> None:
@@ -595,40 +630,7 @@ class VulkanContext:
                 dstoffset = 0
             sizeleft -= copysize
 
-        vk.vkEndCommandBuffer(commandbuffer)
-
-        waitsemaphore = vk.VkSemaphoreSubmitInfo(
-            semaphore=self.timeline_semaphore,
-            value=self.timeline_host,
-            stageMask=vk.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
-        )
-        signalsemaphore = vk.VkSemaphoreSubmitInfo(
-            semaphore=self.timeline_semaphore,
-            value=self.timeline_host + 1,
-            stageMask=vk.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
-        )
-        cbsi = vk.VkCommandBufferSubmitInfo(
-            commandBuffer=commandbuffer,
-        )
-
-        si2 = vk.VkSubmitInfo2(
-            waitSemaphoreInfoCount=1,
-            pWaitSemaphoreInfos=[waitsemaphore],
-            commandBufferInfoCount=1,
-            pCommandBufferInfos=[cbsi],
-            signalSemaphoreInfoCount=1,
-            pSignalSemaphoreInfos=[signalsemaphore],
-        )
-
-        func = vk.vkGetDeviceProcAddr(self.device, "vkQueueSubmit2KHR")
-        func(
-            self.queue,
-            1,
-            [si2],
-            0,
-        )
-
-        self.timeline_host += 1
+        self.submit_commandbuffer(commandbuffer)
         self.release_commandpool(commandpool)
 
     def upload(
