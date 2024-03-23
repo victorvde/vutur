@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import os
 import logging
 from typing import Any, Optional, Callable
@@ -48,6 +48,7 @@ def debug_callback(
 
 
 class VulkanContext:
+    destroyed: bool
     instance: object  # vk.VkInstance
     layers: set[str]
     extensions: set[str]
@@ -71,6 +72,8 @@ class VulkanContext:
     delayed: list[Delayed]
 
     def __init__(self, device_filter: Optional[str] = None) -> None:
+        self.destroyed = False
+
         if device_filter is None:
             device_filter = os.getenv("VUTUR_DEVICE", "")
 
@@ -98,7 +101,10 @@ class VulkanContext:
         self.create_timeline_semaphore()
         self.delayed = []
 
-    def __del__(self) -> None:
+    def destroy(self) -> None:
+        if self.destroyed:
+            return
+
         if hasattr(self, "delayed"):
             vk.vkDeviceWaitIdle(self.device)
             self.maintain()
@@ -118,6 +124,11 @@ class VulkanContext:
             vk.vkDestroyDevice(self.device, None)
         if hasattr(self, "instance"):
             vk.vkDestroyInstance(self.instance, None)
+
+        self.destroyed = True
+
+    def __del__(self) -> None:
+        self.destroy()
 
     def create_instance(
         self,
@@ -460,6 +471,8 @@ class VulkanContext:
         vk.vkFreeMemory(self.device, chunk.mem, None)
 
     def suballocate(self, size: int, memtype: int) -> VulkanSuballocation:
+        assert not self.destroyed
+
         def alloc_chunk(chunk_size: int) -> VulkanChunk:
             return self.allocate_chunk(chunk_size, memtype)
 
@@ -471,6 +484,8 @@ class VulkanContext:
         return VulkanSuballocation(size, memtype, self, allocator, allocation)
 
     def subfree(self, suballocation: VulkanSuballocation) -> None:
+        assert not self.destroyed
+
         def run() -> None:
             suballocation.allocator.free_split(
                 suballocation.allocation, self.free_chunk
@@ -581,6 +596,7 @@ class VulkanContext:
         self.release_commandpool(commandpool)
 
     def upload(self, suballocation: VulkanSuballocation, src: memoryview) -> None:
+        assert not self.destroyed
         assert src.nbytes == suballocation.size, (src.nbytes, suballocation.size)
 
         use_staging = suballocation.memtype != self.upload_memory
@@ -593,8 +609,10 @@ class VulkanContext:
         for s in upload_allocation.allocation:
             assert isinstance(s.chunk, VulkanChunk)
             assert s.chunk.mapping is not None
-            dest = s.chunk.mapping + s.offset
-            vk.ffi.memmove(dest, src[srcoffset:], s.size)
+            copysize = min(src.nbytes - srcoffset, s.size)
+            s.chunk.mapping[s.offset : s.offset + copysize] = src[
+                srcoffset : srcoffset + copysize
+            ]
             srcoffset += s.size
 
         if use_staging:
@@ -602,6 +620,7 @@ class VulkanContext:
             self.subfree(upload_allocation)
 
     def download(self, suballocation: VulkanSuballocation) -> None:
+        assert not self.destroyed
         ...
 
     def maintain(self) -> None:
@@ -637,9 +656,17 @@ class VulkanSuballocation:
     vulkan_context: VulkanContext
     allocator: Allocator
     allocation: list[Allocation]
+    destroyed: bool = field(default=False)
+
+    def destroy(self) -> None:
+        if self.destroyed:
+            return
+
+        self.vulkan_context.subfree(self)
+        self.destroyed = True
 
     def __del__(self) -> None:
-        self.vulkan_context.subfree(self)
+        self.destroy()
 
 
 # class VulkanContext:
