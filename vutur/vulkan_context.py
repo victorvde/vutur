@@ -560,14 +560,15 @@ class VulkanContext:
         srcoffset = 0
         dsti = 0
         dstoffset = 0
-        while True:
+        sizeleft = src.size
+        while sizeleft > 0:
             srca = src.allocation[srci]
             srcsize = srca.size
             dsta = dst.allocation[dsti]
             dstsize = dsta.size
             copysize = min(srcsize, dstsize)
 
-            region = vk.vkBufferCopy(
+            region = vk.VkBufferCopy(
                 srcOffset=srca.offset + srcoffset,
                 dstOffset=dsta.offset + dstoffset,
                 size=copysize,
@@ -583,6 +584,18 @@ class VulkanContext:
                 1,
                 [region],
             )
+
+            srcoffset += copysize
+            dstoffset += copysize
+            if srcoffset == src.allocation[srci].size:
+                srci += 1
+                srcoffset = 0
+            if dstoffset == dst.allocation[dsti].size:
+                dsti += 1
+                dstoffset = 0
+            sizeleft -= copysize
+
+        vk.vkEndCommandBuffer(commandbuffer)
 
         waitsemaphore = vk.VkSemaphoreSubmitInfo(
             semaphore=self.timeline_semaphore,
