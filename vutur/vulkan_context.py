@@ -13,7 +13,6 @@ from vutur.allocator import Allocator, Allocation, OutOfMemory
 import vulkan as vk
 
 DEBUG_LAYER = "VK_LAYER_KHRONOS_validation"
-DEBUG_EXTENSION = "VK_EXT_debug_utils"
 
 
 __all__ = [
@@ -237,7 +236,7 @@ class VulkanContext:
         """
         @private Part of __init__.
         """
-        if DEBUG_EXTENSION in self.extensions:
+        if vk.VK_EXT_DEBUG_UTILS_EXTENSION_NAME in self.extensions:
             func = vk.vkGetInstanceProcAddr(
                 self.instance, "vkCreateDebugUtilsMessengerEXT"
             )
