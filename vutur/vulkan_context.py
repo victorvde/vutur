@@ -55,6 +55,13 @@ def debug_callback(
     return False
 
 
+@dataclass
+class Descriptors:
+    pool: object  # vk.vkDescriptorPool
+    set: object  # vk.DescriptorSet
+    setlayout: object  # vk.descriptorsetlayout
+
+
 class VulkanContext:
     """
     Everything related to a Vulkan instance (device, queue etc).
@@ -74,6 +81,7 @@ class VulkanContext:
     device: object  # vk.VkDevice
     queue: object  # vk.VkQueue
     commandpool_pool: list[object]  # list[vk.vkCommandPool]
+    descriptors: dict[int, Descriptors]  # dict[memtype, Descriptors]
     memory_properties: vk.VkPhysicalDeviceMemoryProperties2
     buffer_create_info: vk.VkBufferCreateInfo
     buffer_requirements: vk.VkMemoryRequirements
@@ -118,6 +126,8 @@ class VulkanContext:
         self.commandpool_pool = []
         self.create_memories(prefer_separate_memory)
 
+        self.descriptors = {}
+
         self.allocators = {}
         self.create_allocator(self.device_memory)
         self.create_allocator(self.upload_memory)
@@ -130,6 +140,11 @@ class VulkanContext:
         """Clean up, automatically called from `___del___`."""
         if self.destroyed:
             return
+
+        if hasattr(self, "descriptors"):
+            for memtype in self.descriptors:
+                # needs to be before maintain
+                self.destroy_descriptors(memtype)
 
         if hasattr(self, "delayed"):
             vk.vkDeviceWaitIdle(self.device)
@@ -541,9 +556,11 @@ class VulkanContext:
         else:
             mapping = None
 
+        self.destroy_descriptors(memtype)
+
         return VulkanChunk(mem, buf, mapping)
 
-    def free_chunk(self, chunk: VulkanChunk) -> None:
+    def free_chunk(self, chunk: VulkanChunk, memtype: int) -> None:
         """
         @private Free a Vulkan allocation, called by the suballocators.
         """
@@ -551,6 +568,8 @@ class VulkanContext:
         if chunk.mapping is not None:
             vk.vkUnmapMemory(self.device, chunk.mem)
         vk.vkFreeMemory(self.device, chunk.mem, None)
+
+        self.destroy_descriptors(memtype)
 
     def suballocate(self, size: int, memtype: int) -> VulkanSuballocation:
         """
@@ -562,7 +581,7 @@ class VulkanContext:
             return self.allocate_chunk(chunk_size, memtype)
 
         def free_chunk(chunk: VulkanChunk) -> None:
-            return self.free_chunk(chunk)
+            return self.free_chunk(chunk, memtype)
 
         allocator = self.allocators[memtype]
         allocation = allocator.allocate_split(size, alloc_chunk, free_chunk)
@@ -570,14 +589,16 @@ class VulkanContext:
 
     def subfree(self, suballocation: VulkanSuballocation) -> None:
         """
-        Free a Vulkan suballocation.
+        @orivate Free a Vulkan suballocation.
+        Don't call directly, it's called from `VulkanSuballocation.destroy`.
         """
         assert not self.destroyed
 
         def run() -> None:
-            suballocation.allocator.free_split(
-                suballocation.allocation, self.free_chunk
-            )
+            def free_chunk(chunk: VulkanChunk) -> None:
+                self.free_chunk(chunk, suballocation.memtype)
+
+            suballocation.allocator.free_split(suballocation.allocation, free_chunk)
 
         self.delay(run)
 
@@ -811,6 +832,82 @@ class VulkanContext:
                 return True
 
         self.delayed = [df for df in self.delayed if run_if_ready(df)]
+
+    def destroy_descriptors(self, memtype: int) -> None:
+        if memtype not in self.descriptors:
+            return
+
+        descriptors = self.descriptors[memtype]
+
+        def run() -> None:
+            vk.vkDestroyDescriptorPool(self.device, descriptors.pool, None)
+            vk.vkDestroyDescriptorSetLayout(self.device, descriptors.setlayout, None)
+
+        del self.descriptors[memtype]
+
+    def get_descriptors(self, memtype: int) -> Descriptors:
+        if memtype in self.descriptors:
+            return self.descriptors[memtype]
+
+        chunks = self.allocators[memtype].chunks()
+        nbind = max(chunks.keys()) + 1
+
+        dslb = vk.VkDescriptorSetLayoutBinding(
+            binding=0,
+            descriptorType=vk.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            descriptorCount=1,
+            stageFlags=vk.VK_SHADER_STAGE_COMPUTE_BIT,
+        )
+        dslci = vk.VkDescriptorSetLayoutCreateInfo(
+            bindingCount=1,
+            pBindings=[dslb] * nbind,
+        )
+        descriptorsetlayout = vk.vkCreateDescriptorSetLayout(self.device, dslci, None)
+
+        dps = vk.VkDescriptorPoolSize(
+            type=vk.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            descriptorCount=nbind,
+        )
+        dpci = vk.VkDescriptorPoolCreateInfo(
+            maxSets=1,
+            poolSizeCount=1,
+            pPoolSizes=[dps],
+        )
+        descriptorpool = vk.vkCreateDescriptorPool(self.device, dpci, None)
+
+        dsai = vk.VkDescriptorSetAllocateInfo(
+            descriptorPool=descriptorpool,
+            descriptorSetCount=1,
+            pSetLayouts=[descriptorsetlayout],
+        )
+        descriptorset = vk.vkAllocateDescriptorSets(self.device, dsai)[0]
+
+        wdbs_l = []
+        for chunk_idx, chunk in chunks.items():
+            assert isinstance(chunk, VulkanChunk)
+            dbi = vk.VkDescriptorBufferInfo(
+                buffer=chunk.buffer,
+                offset=0,
+                range=vk.VK_WHOLE_SIZE,
+            )
+            wdbs = vk.VkWriteDescriptorSet(
+                dstSet=descriptorset,
+                dstBinding=chunk_idx,
+                descriptorCount=1,
+                descriptorType=vk.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                pBufferInfo=[dbi],
+            )
+            wdbs_l.append(wdbs)
+        vk.vkUpdateDescriptorSets(self.device, len(wdbs_l), wdbs_l, 0, None)
+
+        descriptors = Descriptors(
+            descriptorpool,
+            descriptorset,
+            descriptorsetlayout,
+        )
+        self.descriptors[memtype] = descriptors
+
+        return descriptors
 
 
 @dataclass
