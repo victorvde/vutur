@@ -45,7 +45,7 @@ class SubAllocation:
 
 @dataclass
 class Free:
-    suballocator: int
+    chunk_idx: int
     index: int
     offset: int
     size: int
@@ -56,9 +56,9 @@ class Allocation:
     """A single allocation within one of the chunks"""
 
     chunk: object
-    """The chunk object as returned by the user specified chunk allocation function"""
-    suballocator: int
-    """@private"""
+    """The chunk object as returned by the user specified chunk allocation function."""
+    chunk_idx: int
+    """The index of the chunk in `Allocator.chunks`."""
     offset: int
     """Offset within the chunk."""
     size: int
@@ -224,11 +224,11 @@ class Allocator:
             fit = self.best_fit(size)  # todo: only check new chunk?
             assert fit.size >= size, "We just allocated a chunk so it should fit"
 
-        self.suballocators[fit.suballocator].insert(fit.index, fit.offset, size)
+        self.suballocators[fit.chunk_idx].insert(fit.index, fit.offset, size)
 
         return Allocation(
-            self.suballocators[fit.suballocator].chunk,
-            fit.suballocator,
+            self.suballocators[fit.chunk_idx].chunk,
+            fit.chunk_idx,
             fit.offset,
             size,
         )
@@ -273,11 +273,11 @@ class Allocator:
         * `allocation`: what to free.
         * `free_chunk`: user-defined chunk free function (e.g. `vkFreeMemory`/`vkDestroyBuffer`).
         """
-        s = self.suballocators[allocation.suballocator]
+        s = self.suballocators[allocation.chunk_idx]
         s.remove(allocation.offset, allocation.size)
         if len(s.allocations) == 0:
             free_chunk(s.chunk)
-            del self.suballocators[allocation.suballocator]
+            del self.suballocators[allocation.chunk_idx]
 
     def free_split(
         self, splitallocation: list[Allocation], free_chunk: Callable[[Any], None]
@@ -296,3 +296,9 @@ class Allocator:
         """
         for s in self.suballocators.values():
             s.sanity_check()
+
+    def chunks(self) -> dict[int, object]:
+        """
+        Get a `dict` of chunk index to chunk objects.
+        """
+        return {i: s.chunk for i, s in self.suballocators.items()}
