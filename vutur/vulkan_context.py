@@ -579,7 +579,7 @@ class VulkanContext:
                 suballocation.allocation, self.free_chunk
             )
 
-        self.delayed.append(Delayed(self.timeline_host, run))
+        self.delay(run)
 
     def get_commandpool(self) -> object:
         """
@@ -606,7 +606,7 @@ class VulkanContext:
             )
             self.commandpool_pool.append(commandpool)
 
-        self.delayed.append(Delayed(self.timeline_host, run))
+        self.delay(run)
 
     def get_commandbuffer(self, commandpool: object) -> object:
         """
@@ -793,6 +793,9 @@ class VulkanContext:
         self.maintain()
 
         return dst
+
+    def delay(self, run: Callable[[], None]) -> None:
+        self.delayed.append(Delayed(self.timeline_host, run))
 
     def maintain(self) -> None:
         """
