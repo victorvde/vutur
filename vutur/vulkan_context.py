@@ -926,6 +926,56 @@ class VulkanContext:
 
         return descriptors
 
+    def compute(self, code: bytes, x: int, y: int, z: int) -> None:
+        smci = vk.VkShaderModuleCreateInfo(codeSize=len(code), pCode=code)
+
+        csm = vk.vkCreateShaderModule(self.device, smci, None)
+
+        pssci = vk.VkPipelineShaderStageCreateInfo(
+            stage=vk.VK_SHADER_STAGE_COMPUTE_BIT, module=csm, pName="main"
+        )
+
+        # todo: support compute on memory that is not the device memory
+        descriptors = self.get_descriptors(self.device_memory)
+        assert self.device_memory == 0
+
+        plci = vk.VkPipelineLayoutCreateInfo(
+            setLayoutCount=1, pSetLayouts=[descriptors.setlayout]
+        )
+        pipelinelayout = vk.vkCreatePipelineLayout(self.device, plci, None)
+
+        plci = vk.VkComputePipelineCreateInfo(
+            stage=pssci,
+            layout=pipelinelayout,
+        )
+        pipeline = vk.vkCreateComputePipelines(
+            self.device, vk.VK_NULL_HANDLE, 1, plci, None
+        )[0]
+
+        descriptors = self.get_descriptors(self.device_memory)
+
+        commandpool = self.get_commandpool()
+        commandbuffer = self.get_commandbuffer(commandpool)
+
+        vk.vkCmdBindPipeline(commandbuffer, vk.VK_PIPELINE_BIND_POINT_COMPUTE, pipeline)
+        # todo: don't rebind descriptor set if still bound?
+        vk.vkCmdBindDescriptorSets(
+            commandbuffer,
+            vk.VK_PIPELINE_BIND_POINT_COMPUTE,
+            pipelinelayout,
+            0,
+            1,
+            [descriptors.set],
+            0,
+            None,
+        )
+
+        vk.vkCmdDispatch(commandbuffer, x, y, z)
+
+        vk.vkEndCommandBuffer(commandbuffer)
+        self.submit_commandbuffer(commandbuffer)
+        self.release_commandpool(commandpool)
+
 
 @dataclass
 class VulkanChunk:
