@@ -85,6 +85,7 @@ class VulkanContext:
     memory_properties: vk.VkPhysicalDeviceMemoryProperties2
     buffer_create_info: vk.VkBufferCreateInfo
     buffer_requirements: vk.VkMemoryRequirements
+    memorytypes: list[int]
     device_memory: int
     upload_memory: int
     download_memory: int
@@ -123,7 +124,10 @@ class VulkanContext:
                 vk.VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
             },
         )
+
         self.commandpool_pool = []
+
+        self.memorytypes = []
         self.create_memories(prefer_separate_memory)
 
         self.descriptors = {}
@@ -142,9 +146,9 @@ class VulkanContext:
             return
 
         if hasattr(self, "descriptors"):
-            for memtype in self.descriptors:
+            for memtypeidx in self.descriptors:
                 # needs to be before maintain
-                self.destroy_descriptors(memtype)
+                self.destroy_descriptors(memtypeidx)
 
         if hasattr(self, "delayed"):
             vk.vkDeviceWaitIdle(self.device)
@@ -415,12 +419,6 @@ class VulkanContext:
         )
         assert default_host_memory is not None  # guaranteed by spec
 
-        if prefer_separate_memory:
-            self.device_memory = default_device_memory
-            self.upload_memory = default_host_memory
-            self.download_memory = default_host_memory
-            return
-
         default_device_heap = self.memory_properties.memoryProperties.memoryTypes[
             default_device_memory
         ].heapIndex
@@ -454,50 +452,69 @@ class VulkanContext:
             None,
         )
 
-        def notnone(li: list[Optional[int]]) -> int:
+        def memorytypeindex(li: list[Optional[int]]) -> int:
             """Needed because using `or` would consider index 0 false"""
             for e in li:
                 if e is not None:
-                    return e
+                    logging.debug(f"picked memoryType {e}")
+                    if e not in self.memorytypes:
+                        self.memorytypes.append(e)
+                    return self.memorytypes.index(e)
             assert False, li
 
-        self.device_memory = notnone(
-            [
-                device_upload_download_memory,
-                device_upload_memory,
-                device_download_memory,
-                default_device_memory,
-            ]
-        )
-        self.upload_memory = notnone(
-            [
-                device_upload_download_memory,
-                device_upload_memory,
-                default_host_memory,
-            ]
-        )
-        self.download_memory = notnone(
-            [
-                device_upload_download_memory,
-                device_download_memory,
-                host_download_memory,
-                default_host_memory,
-            ]
-        )
-        logging.debug(f"{self.device_memory=}")
-        logging.debug(f"{self.upload_memory=}")
-        logging.debug(f"{self.download_memory=}")
+        if prefer_separate_memory:
+            self.device_memory = memorytypeindex(
+                [
+                    default_device_memory,
+                ]
+            )
+            self.upload_memory = memorytypeindex(
+                [
+                    default_host_memory,
+                ]
+            )
+            self.download_memory = memorytypeindex(
+                [
+                    host_download_memory,
+                    default_host_memory,
+                ]
+            )
+        else:
+            self.device_memory = memorytypeindex(
+                [
+                    device_upload_download_memory,
+                    device_upload_memory,
+                    device_download_memory,
+                    default_device_memory,
+                ]
+            )
+            self.upload_memory = memorytypeindex(
+                [
+                    device_upload_download_memory,
+                    device_upload_memory,
+                    default_host_memory,
+                ]
+            )
+            self.download_memory = memorytypeindex(
+                [
+                    device_upload_download_memory,
+                    device_download_memory,
+                    host_download_memory,
+                    default_host_memory,
+                ]
+            )
 
-    def create_allocator(self, memtype: int) -> None:
+    def create_allocator(self, memtypeidx: int) -> None:
         """
         @private Part of __init__.
         """
-        if memtype in self.allocators:
+        if memtypeidx in self.allocators:
             return
 
+        memtype = self.memorytypes[memtypeidx]
         props = self.memory_properties.memoryProperties.memoryTypes[memtype]
         heap = self.memory_properties.memoryProperties.memoryHeaps[props.heapIndex]
-        self.allocators[memtype] = Allocator(
+        self.allocators[memtypeidx] = Allocator(
             alignment=self.buffer_requirements.alignment,
             max_memory=heap.size,
             max_contiguous_size=self.physicaldevice_properties.properties.limits.maxStorageBufferRange,
@@ -533,10 +550,11 @@ class VulkanContext:
         """
         return self.suballocate(size, self.device_memory)
 
-    def allocate_chunk(self, chunk_size: int, memtype: int) -> VulkanChunk:
+    def allocate_chunk(self, chunk_size: int, memtypeidx: int) -> VulkanChunk:
         """
         @private Create a Vulkan allocation, called by the suballocators.
         """
+        memtype = self.memorytypes[memtypeidx]
         mai = vk.VkMemoryAllocateInfo(
             allocationSize=chunk_size,
             memoryTypeIndex=memtype,
@@ -551,16 +569,16 @@ class VulkanContext:
         buf = vk.vkCreateBuffer(self.device, bci, None)
         vk.vkBindBufferMemory(self.device, buf, mem, 0)
 
-        if memtype in (self.upload_memory, self.download_memory):
+        if memtypeidx in (self.upload_memory, self.download_memory):
             mapping = vk.vkMapMemory(self.device, mem, 0, chunk_size, 0)
         else:
             mapping = None
 
-        self.destroy_descriptors(memtype)
+        self.destroy_descriptors(memtypeidx)
 
         return VulkanChunk(mem, buf, mapping)
 
-    def free_chunk(self, chunk: VulkanChunk, memtype: int) -> None:
+    def free_chunk(self, chunk: VulkanChunk, memtypeidx: int) -> None:
         """
         @private Free a Vulkan allocation, called by the suballocators.
         """
@@ -569,23 +587,23 @@ class VulkanContext:
             vk.vkUnmapMemory(self.device, chunk.mem)
         vk.vkFreeMemory(self.device, chunk.mem, None)
 
-        self.destroy_descriptors(memtype)
+        self.destroy_descriptors(memtypeidx)
 
-    def suballocate(self, size: int, memtype: int) -> VulkanSuballocation:
+    def suballocate(self, size: int, memtypeidx: int) -> VulkanSuballocation:
         """
         @private Create a Vulkan allocation on whatever memory type.
         """
         assert not self.destroyed
 
         def alloc_chunk(chunk_size: int) -> VulkanChunk:
-            return self.allocate_chunk(chunk_size, memtype)
+            return self.allocate_chunk(chunk_size, memtypeidx)
 
         def free_chunk(chunk: VulkanChunk) -> None:
-            return self.free_chunk(chunk, memtype)
+            return self.free_chunk(chunk, memtypeidx)
 
-        allocator = self.allocators[memtype]
+        allocator = self.allocators[memtypeidx]
         allocation = allocator.allocate_split(size, alloc_chunk, free_chunk)
-        return VulkanSuballocation(size, memtype, self, allocator, allocation)
+        return VulkanSuballocation(size, memtypeidx, self, allocator, allocation)
 
     def subfree(self, suballocation: VulkanSuballocation) -> None:
         """
@@ -596,7 +614,7 @@ class VulkanContext:
 
         def run() -> None:
             def free_chunk(chunk: VulkanChunk) -> None:
-                self.free_chunk(chunk, suballocation.memtype)
+                self.free_chunk(chunk, suballocation.memtypeidx)
 
             suballocation.allocator.free_split(suballocation.allocation, free_chunk)
 
@@ -752,7 +770,7 @@ class VulkanContext:
         src = memoryview(src)
         assert src.nbytes == suballocation.size, (src.nbytes, suballocation.size)
 
-        use_staging = suballocation.memtype != self.upload_memory
+        use_staging = suballocation.memtypeidx != self.upload_memory
         if use_staging:
             upload_allocation = self.suballocate(suballocation.size, self.upload_memory)
         else:
@@ -780,7 +798,7 @@ class VulkanContext:
 
         self.maintain()
 
-        use_staging = suballocation.memtype != self.download_memory
+        use_staging = suballocation.memtypeidx != self.download_memory
         if use_staging:
             download_allocation = self.suballocate(
                 suballocation.size, self.download_memory
@@ -833,23 +851,23 @@ class VulkanContext:
 
         self.delayed = [df for df in self.delayed if run_if_ready(df)]
 
-    def destroy_descriptors(self, memtype: int) -> None:
-        if memtype not in self.descriptors:
+    def destroy_descriptors(self, memtypeidx: int) -> None:
+        if memtypeidx not in self.descriptors:
             return
 
-        descriptors = self.descriptors[memtype]
+        descriptors = self.descriptors[memtypeidx]
 
         def run() -> None:
             vk.vkDestroyDescriptorPool(self.device, descriptors.pool, None)
             vk.vkDestroyDescriptorSetLayout(self.device, descriptors.setlayout, None)
 
-        del self.descriptors[memtype]
+        del self.descriptors[memtypeidx]
 
-    def get_descriptors(self, memtype: int) -> Descriptors:
-        if memtype in self.descriptors:
-            return self.descriptors[memtype]
+    def get_descriptors(self, memtypeidx: int) -> Descriptors:
+        if memtypeidx in self.descriptors:
+            return self.descriptors[memtypeidx]
 
-        chunks = self.allocators[memtype].chunks()
+        chunks = self.allocators[memtypeidx].chunks()
         nbind = max(chunks.keys()) + 1
 
         dslb = vk.VkDescriptorSetLayoutBinding(
@@ -905,7 +923,7 @@ class VulkanContext:
             descriptorset,
             descriptorsetlayout,
         )
-        self.descriptors[memtype] = descriptors
+        self.descriptors[memtypeidx] = descriptors
 
         return descriptors
 
@@ -938,7 +956,7 @@ class VulkanSuballocation:
     """
 
     size: int
-    memtype: int
+    memtypeidx: int
     vulkan_context: VulkanContext
     allocator: Allocator
     allocation: list[Allocation]
