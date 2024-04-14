@@ -1,4 +1,4 @@
-from vutur.vulkan_context import VulkanContext
+from vutur.vulkan import VulkanContext
 
 import pytest
 
