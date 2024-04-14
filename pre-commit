@@ -14,7 +14,9 @@ trap "rm -rf $tmpdir" EXIT
 git checkout-index --prefix=$tmpdir/ -af
 
 # copy mypy cache to speed things up
-cp -raf .mypy_cache "$tmpdir/"
+if [ -d .mypy_cache ]; then
+  cp -raf .mypy_cache "$tmpdir/"
+fi
 
 # run tests in a subshell so that we end up back in the current
 # directory when everything finishes.
