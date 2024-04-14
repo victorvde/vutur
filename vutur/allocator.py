@@ -1,6 +1,10 @@
 """
 Turns big chunks of memory into smaller allocations.
 Tailored to Vulkan, for example by being able to split allocations bigger than the maximum buffer size into multiple allocations.
+
+The current implementation is a simple best-fit allocator with a list of current allocations.
+While this is not super fast, I want to retain the flexibility because
+the needs of the graph optimizer when allocating for an entire graph are not clear yet.
 """
 
 from typing import Iterator, Optional, Callable, Any

@@ -1,6 +1,20 @@
 # adapted from https://github.com/realitix/vulkan/blob/master/example/contribs/example_mandelbrot_compute.py
 # which is a port from https://github.com/Erkaman/vulkan_minimal_compute
 
+"""
+Handles all the Vulkan stuff, like instances, devices, extensions, layers, queues...
+Requires Vulkan 1.1 and `VK_KHR_timeline_semaphore` and `VK_KHR_synchronization2` (available as [extension layers](https://github.com/KhronosGroup/Vulkan-ExtensionLayer)),
+
+Enables the debug layer (`VK_LAYER_KHRONOS_validation`) if available, with Python `logging` for the messages.
+
+Synchronization between device (GPU) and host (CPU) is done via a counter on both sides (timeline semaphore).
+Transient Vulkan objects are destroyed once we notice they are no longer used by the device.
+Command pools are created when necessary and reused.
+Descriptor pools, sets, and set layouts are created on demand and cached until invalidated.
+
+Memory is allocated in 512MiB chunks, and suballocated using `vutur.allocator`.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -606,7 +620,7 @@ class VulkanContext:
 
     def subfree(self, suballocation: VulkanSuballocation) -> None:
         """
-        @orivate Free a Vulkan suballocation.
+        @private Free a Vulkan suballocation.
         Don't call directly, it's called from `VulkanSuballocation.destroy`.
         """
         assert not self.destroyed
@@ -774,6 +788,7 @@ class VulkanContext:
             upload_allocation = self.suballocate(suballocation.size, self.upload_memory)
         else:
             upload_allocation = suballocation
+            # todo: what if the allocation is in use by the device?
 
         srcoffset = 0
         for s in upload_allocation.allocation:
@@ -805,6 +820,7 @@ class VulkanContext:
             self.copy_allocation(suballocation, download_allocation)
         else:
             download_allocation = suballocation
+            # todo: what if the allocation is in use by the device?
 
         smwi = vk.VkSemaphoreWaitInfo(
             semaphoreCount=1,
