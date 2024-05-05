@@ -35,3 +35,6 @@ cov:
 
 docs:
 	pdoc vutur -o docs_build
+
+vutur/spirv_instructions.py: vutur/tools/spirv_generator.py
+	python vutur/tools/spirv_generator.py  ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json > vutur/spirv_instructions.py
