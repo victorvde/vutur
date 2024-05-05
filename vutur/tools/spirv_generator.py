@@ -10,11 +10,54 @@ def sanitize(identifier: str) -> str:
     return identifier
 
 
+def load_kind_types(fn: str) -> dict[str, str]:
+    kind_types = {}
+
+    with open(fn, "rb") as f:
+        data = json.load(f)
+    operand_kinds = data["operand_kinds"]
+
+    for operand_kind in operand_kinds:
+        category = operand_kind["category"]
+        kind = operand_kind["kind"]
+        match category:
+            case "BitEnum" | "ValueEnum":
+                kind_types[kind] = kind
+            case "Id":
+                kind_types[kind] = "SpirvInstruction"
+            case "Literal":
+                match kind:
+                    case (
+                        "LiteralInteger"
+                        | "LiteralExtInstInteger"
+                        | "LiteralSpecConstantOpInteger"
+                    ):
+                        t = "int"
+                    case "LiteralString":
+                        t = "str"
+                    case "LiteralFloat" | "LiteralContextDependentNumber":
+                        t = "float"
+                    case e:
+                        assert False, e
+                kind_types[kind] = t
+            case "Composite":
+                bases = operand_kind["bases"]
+                ts = [kind_types[k] for k in bases]
+                t = f"tuple[{", ".join(ts)}]"
+                kind_types[kind] = t
+            case e:
+                assert False, e
+
+    return kind_types
+
+
 def main() -> None:
     """
     Convert spirv grammar json to Python file the way we like it.
     """
-    fn = sys.argv[1]
+    kind_types = load_kind_types(sys.argv[1])
+
+    fn = sys.argv[2]
     with open(fn, "rb") as f:
         data = json.load(f)
 
@@ -39,24 +82,13 @@ def main() -> None:
     print('"""')
 
     print("from enum import IntFlag, IntEnum")
-    print("from typing import Optional, Union")
-    print("from dataclasses import dataclass")
-    print()
-    print()
-    print(f"SPIRV_MAGIC_NUMBER = {magic}")
-    print()
-    print()
-    print('base_argtype = Union[None, "SpirvInstruction", str, int, float]')
-    print('argtype = Union[tuple["argtype", ...], base_argtype]')
-    print()
-    print()
-    print("@dataclass")
-    print("class SpirvInstruction:")
-    print("    opcode: int")
-    print("    args: list[argtype]")
-    print("    hasresult: bool")
+    print("from vutur.spirv import SpirvInstruction")
+    print("from typing import Optional")
+    if magic is not None:
+        print()
+        print()
+        print(f"SPIRV_MAGIC_NUMBER = {magic}")
 
-    kind_types = {}
     for operand_kind in operand_kinds:
         category = operand_kind.pop("category")
         kind = operand_kind.pop("kind")
@@ -80,7 +112,6 @@ def main() -> None:
                         continue
 
                     print(f"    {sanitize(enumerant_)} = {value}")
-                kind_types[kind] = kind
             case "ValueEnum":
                 print()
                 print()
@@ -89,11 +120,9 @@ def main() -> None:
                     enumerant_ = enumerant.pop("enumerant")
                     value = enumerant.pop("value")
                     print(f"    {sanitize(enumerant_)} = {value}")
-                kind_types[kind] = kind
             case "Id":
                 _doc = operand_kind.pop("doc")
                 # we don't differentiate between id's for now
-                kind_types[kind] = "SpirvInstruction"
             case "Literal":
                 _doc = operand_kind.pop("doc")
                 match kind:
@@ -109,16 +138,10 @@ def main() -> None:
                         t = "float"
                     case e:
                         assert False, e
-                kind_types[kind] = t
             case "Composite":
-                bases = operand_kind.pop("bases")
-                ts = [kind_types[k] for k in bases]
-                t = f"tuple[{", ".join(ts)}]"
-                kind_types[kind] = t
+                _bases = operand_kind.pop("bases")
             case e:
                 assert False, e
-        # for enumerant in enumerants:
-        #     assert len(enumerant) == 0, enumerant.keys()
 
         assert len(operand_kind) == 0, operand_kind.keys()
 
@@ -187,7 +210,7 @@ def main() -> None:
         print("    return SpirvInstruction(")
         print(f"        {opcode=},")
         print(f"        args=[{", ".join(usednames)}],")
-        print(f'        {hasresult=},')
+        print(f"        {hasresult=},")
         print("    )")
 
 
