@@ -50,7 +50,7 @@ def main() -> None:
     print("class SpirvInstruction:")
     print("    opcode: int")
     print("    args: list[argtype]")
-    print("    hasresult: object")
+    print("    hasresult: bool")
 
     kind_types = {}
     for operand_kind in operand_kinds:
@@ -183,7 +183,7 @@ def main() -> None:
         print("    return SpirvInstruction(")
         print(f"        {opcode=},")
         print(f"        args=[{", ".join(usednames)}],")
-        print(f'        hasresult="{hasresult}",')
+        print(f'        {hasresult=},')
         print("    )")
 
 
