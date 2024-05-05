@@ -175,9 +175,10 @@ def main() -> None:
         ]
         hasresult = False
         for i in range(len(operands)):
-            if operands[i]["kind"] == "OpResult":
+            if operands[i]["kind"] == "IdResult":
                 hasresult = True
                 del operands[i]
+                break
         print()
         print()
         if len(operands) == 0:
