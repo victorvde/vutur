@@ -82,7 +82,7 @@ def main() -> None:
     print('"""')
 
     print("from enum import IntFlag, IntEnum")
-    print("from vutur.spirv import SpirvInstruction")
+    print("from vutur.spirv_base import SpirvInstruction")
     print("from typing import Optional")
     if magic is not None:
         print()
@@ -173,45 +173,49 @@ def main() -> None:
             "j",
             "k",
         ]
+        print()
+        print()
+        hasarguments = False
         hasresult = False
-        for i in range(len(operands)):
-            if operands[i]["kind"] == "IdResult":
-                hasresult = True
-                del operands[i]
-                break
-        print()
-        print()
-        if len(operands) == 0:
+        hasrtype = False
+        for operand in operands:
+            kind = operand.pop("kind")
+            quantifier = operand.pop("quantifier", None)
+            name = operand.pop("name", None)
+            match kind:
+                case "IdResult":
+                    hasresult = True
+                    continue
+                case "IdResultType":
+                    hasrtype = True
+                    varname = "rtype"
+                case _:
+                    varname = varnames.pop(0)
+                    usednames.append(varname)
+            if not hasarguments:
+                print(f"def {opname}(")
+                hasarguments = True
+            assert len(operand) == 0, operand.keys()
+            t = kind_types[kind]
+            comment = ""
+            if name is not None:
+                comment = f"  # {" ".join(name.splitlines())}"
+            match quantifier:
+                case None:
+                    print(f"    {varname}: {t},{comment}")
+                case "?":
+                    print(f"    {varname}: Optional[{t}] = None,{comment}")
+                case "*":
+                    print(f"    *{varname}: {t},{comment}")
+        if not hasarguments:
             print(f"def {opname}() -> SpirvInstruction:")
         else:
-            print(f"def {opname}(")
-            for operand in operands:
-                kind = operand.pop("kind")
-                quantifier = operand.pop("quantifier", None)
-                name = operand.pop("name", None)
-                match kind:
-                    case "IdResultType":
-                        varname = "rtype"
-                    case _:
-                        varname = varnames.pop(0)
-                        usednames.append(varname)
-                assert len(operand) == 0, operand.keys()
-                t = kind_types[kind]
-                comment = ""
-                if name is not None:
-                    comment = f"  # {" ".join(name.splitlines())}"
-                match quantifier:
-                    case None:
-                        print(f"    {varname}: {t},{comment}")
-                    case "?":
-                        print(f"    {varname}: Optional[{t}] = None,{comment}")
-                    case "*":
-                        print(f"    *{varname}: {t},{comment}")
             print(") -> SpirvInstruction:")
         print("    return SpirvInstruction(")
         print(f"        {opcode=},")
         print(f"        args=[{", ".join(usednames)}],")
         print(f"        {hasresult=},")
+        print(f"        {hasrtype=},")
         print("    )")
 
 
