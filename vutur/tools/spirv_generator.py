@@ -89,6 +89,7 @@ def main() -> None:
         print()
         print(f"SPIRV_MAGIC_NUMBER = {magic}")
 
+    # enums
     for operand_kind in operand_kinds:
         category = operand_kind.pop("category")
         kind = operand_kind.pop("kind")
@@ -145,6 +146,43 @@ def main() -> None:
 
         assert len(operand_kind) == 0, operand_kind.keys()
 
+    # opcode enum and classes
+    print()
+    print()
+    print("class Op(IntEnum):")
+    classes: dict[str, list[str]] = {}
+    for instruction in instructions:
+        opname = instruction["opname"]
+        opcode = instruction["opcode"]
+        assert opname[0:2] == "Op", opname
+        name = opname[2:]
+
+        print(f"    {name} = {opcode}")
+        class_ = instruction["class"]
+        classes.setdefault(class_, []).append(name)
+    print()
+
+    def print_class(varname: str, classname: str) -> None:
+        # classes might not be available in extensions
+        if classname not in classes:
+            return
+        print()
+        print(f"{varname} = [")
+        for n in classes[classname]:
+            print(f"    Op.{n},")
+        print("]")
+
+    print_class("ANNOTATION_OPS", "Annotation")
+    print_class("CONSTANT_OPS", "Constant-Creation")
+    print_class("TYPEDECL_OPS", "Type-Declaration")
+
+    print()
+    print("CONSTANT_OPS = [")
+    for n in classes["Constant-Creation"]:
+        print(f"    Op.{n},")
+    print("]")
+
+    # opcode function
     for instruction in instructions:
         opname = instruction.pop("opname")
         _class = instruction.pop("class", None)

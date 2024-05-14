@@ -1,6 +1,14 @@
 from vutur.spirv_base import SpirvInstruction, Serializer
-from vutur.spirv_instructions import OpFunctionEnd
+from vutur.spirv_instructions import (
+    OpFunctionEnd,
+    Op,
+    ANNOTATION_OPS,
+    CONSTANT_OPS,
+    TYPEDECL_OPS,
+)
 from io import BytesIO
+from dataclasses import dataclass
+import subprocess
 
 
 class SpirvBlock:
@@ -27,55 +35,56 @@ class SpirvFunction:
         OpFunctionEnd().serialize(s)
 
 
+# https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#_logical_layout_of_a_module
+module_globals = [
+    [Op.Capability],
+    [Op.Extension],
+    [Op.ExtInstImport],
+    [Op.MemoryModel],
+    [Op.EntryPoint],
+    [Op.ExecutionMode, Op.ExecutionModeId],
+    [Op.String, Op.SourceExtension, Op.Source, Op.SourceContinued],
+    [Op.Name, Op.MemberName],
+    [Op.ModuleProcessed],
+    ANNOTATION_OPS,
+    TYPEDECL_OPS,  # todo: toposort these?
+    CONSTANT_OPS,  # todo: toposort these?
+    # todo: OpVariable globals
+    [Op.Undef],
+]
+module_globals_lookup = {}
+for i, ops in enumerate(module_globals):
+    for op in ops:
+        module_globals_lookup[int(op)] = i
+
+
+@dataclass
 class SpirvModule:
-    # https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#_logical_layout_of_a_module
-    capabilities: list[SpirvInstruction]
-    extensions: list[SpirvInstruction]
-    extimports: list[SpirvInstruction]
-    memorymodel: SpirvInstruction
-    entrypoints: list[SpirvInstruction]
-    executionmodes: list[SpirvInstruction]
-    strings: list[SpirvInstruction]
-    names: list[SpirvInstruction]
-    moduleprocesseds: list[SpirvInstruction]
-    annotations: list[SpirvInstruction]
-    types: list[SpirvInstruction]
-    constants: list[SpirvInstruction]
-    global_vars: list[SpirvInstruction]
+    global_instructions: list[SpirvInstruction]
     func_decls: list[SpirvFunction]
     func_defs: list[SpirvFunction]
 
     def serialize(self) -> bytes:
+        # todo: get hidden global instuctions function bodies
+
+        global_sections: list[list[SpirvInstruction]] = [] * len(module_globals)
+        for ins in self.global_instructions:
+            i = module_globals_lookup[ins.opcode]
+            global_sections[i].append(ins)
+
         s = Serializer(BytesIO())
 
-        for x in self.capabilities:
-            x.serialize(s)
-        for x in self.extensions:
-            x.serialize(s)
-        for x in self.extimports:
-            x.serialize(s)
-        self.memorymodel.serialize(s)
-        for x in self.entrypoints:
-            x.serialize(s)
-        for x in self.executionmodes:
-            x.serialize(s)
-        for x in self.strings:
-            x.serialize(s)
-        for x in self.names:
-            x.serialize(s)
-        for x in self.moduleprocesseds:
-            x.serialize(s)
-        for x in self.annotations:
-            x.serialize(s)
-        for x in self.types:
-            x.serialize(s)
-        for x in self.constants:
-            x.serialize(s)
-        for x in self.global_vars:
-            x.serialize(s)
+        for section in global_sections:
+            for ins in section:
+                ins.serialize(s)
+
         for f in self.func_decls:
             f.serialize(s)
         for f in self.func_defs:
             f.serialize(s)
 
         return s.out.getvalue()
+
+
+def validate(module: bytes) -> None:
+    subprocess.run(["spirv-val"], check=True, capture_output=True)
