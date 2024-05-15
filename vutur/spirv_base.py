@@ -16,10 +16,10 @@ base_argtype = Union[None, "SpirvInstruction", str, int, float]
 argtype = Union[tuple["argtype", ...], base_argtype]
 
 
-@dataclass
+@dataclass(frozen=True)
 class SpirvInstruction:
     opcode: int
-    args: list[argtype]
+    args: tuple[argtype, ...]
     hasresult: bool
     hasrtype: bool
 
@@ -36,7 +36,7 @@ class SpirvInstruction:
         for arg in args:
             args_b += encode_arg(s, arg)
         wordcount = len(args_b) // 4 + 1
-        first = wordcount << 16 + self.opcode
+        first = (wordcount << 16) + self.opcode
         first_b = first.to_bytes(length=4, byteorder="little")
         s.write(first_b)
         s.write(args_b)

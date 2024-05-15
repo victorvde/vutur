@@ -251,7 +251,9 @@ def main() -> None:
             print(") -> SpirvInstruction:")
         print("    return SpirvInstruction(")
         print(f"        {opcode=},")
-        print(f"        args=[{", ".join(usednames)}],")
+        print(
+            f"        args=({", ".join(usednames)}{"," if len(usednames) == 1 else ""}),"
+        )
         print(f"        {hasresult=},")
         print(f"        {hasrtype=},")
         print("    )")

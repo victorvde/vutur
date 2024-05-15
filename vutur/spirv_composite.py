@@ -11,6 +11,7 @@ from dataclasses import dataclass
 import subprocess
 
 
+@dataclass(frozen=True)
 class SpirvBlock:
     label: SpirvInstruction
     instructions: list[SpirvInstruction]
@@ -21,6 +22,7 @@ class SpirvBlock:
             ins.serialize(s)
 
 
+@dataclass(frozen=True)
 class SpirvFunction:
     function: SpirvInstruction
     parameters: list[SpirvInstruction]
@@ -58,13 +60,15 @@ for i, ops in enumerate(module_globals):
         module_globals_lookup[int(op)] = i
 
 
-@dataclass
+@dataclass(frozen=True)
 class SpirvModule:
     global_instructions: list[SpirvInstruction]
     func_decls: list[SpirvFunction]
     func_defs: list[SpirvFunction]
 
     def serialize(self) -> bytes:
+        # todo magic and headers
+
         # todo: get hidden global instuctions function bodies
 
         global_sections: list[list[SpirvInstruction]] = [] * len(module_globals)
@@ -87,4 +91,7 @@ class SpirvModule:
 
 
 def validate(module: bytes) -> None:
-    subprocess.run(["spirv-val"], check=True, capture_output=True)
+    try:
+        subprocess.run(["spirv-val"], check=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        assert False, e.stderr.decode()
