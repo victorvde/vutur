@@ -227,6 +227,7 @@ def main() -> None:
                 case "IdResultType":
                     hasrtype = True
                     varname = "rtype"
+                    usednames.append("rtype")
                 case _:
                     varname = varnames.pop(0)
                     usednames.append(varname)
