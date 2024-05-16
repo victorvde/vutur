@@ -1981,7 +1981,7 @@ CONSTANT_OPS = [
 
 def OpNop() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=0,
+        opcode=Op.Nop,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -1992,7 +1992,7 @@ def OpUndef(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=1,
+        opcode=Op.Undef,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -2003,7 +2003,7 @@ def OpSourceContinued(
     x: str,  # 'Continued Source'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=2,
+        opcode=Op.SourceContinued,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -2017,7 +2017,7 @@ def OpSource(
     a: Optional[str] = None,  # 'Source'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=3,
+        opcode=Op.Source,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -2028,7 +2028,7 @@ def OpSourceExtension(
     x: str,  # 'Extension'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4,
+        opcode=Op.SourceExtension,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -2040,7 +2040,7 @@ def OpName(
     y: str,  # 'Name'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5,
+        opcode=Op.Name,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -2053,7 +2053,7 @@ def OpMemberName(
     z: str,  # 'Name'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6,
+        opcode=Op.MemberName,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -2064,7 +2064,7 @@ def OpString(
     x: str,  # 'String'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=7,
+        opcode=Op.String,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -2077,7 +2077,7 @@ def OpLine(
     z: int,  # 'Column'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=8,
+        opcode=Op.Line,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -2088,7 +2088,7 @@ def OpExtension(
     x: str,  # 'Name'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=10,
+        opcode=Op.Extension,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -2099,7 +2099,7 @@ def OpExtInstImport(
     x: str,  # 'Name'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=11,
+        opcode=Op.ExtInstImport,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -2113,7 +2113,7 @@ def OpExtInst(
     *z: SpirvInstruction,  # 'Operand 1', + 'Operand 2', + ...
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=12,
+        opcode=Op.ExtInst,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2125,7 +2125,7 @@ def OpMemoryModel(
     y: MemoryModel,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=14,
+        opcode=Op.MemoryModel,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -2139,7 +2139,7 @@ def OpEntryPoint(
     *a: SpirvInstruction,  # 'Interface'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=15,
+        opcode=Op.EntryPoint,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -2151,7 +2151,7 @@ def OpExecutionMode(
     y: ExecutionMode,  # 'Mode'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=16,
+        opcode=Op.ExecutionMode,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -2162,7 +2162,7 @@ def OpCapability(
     x: Capability,  # 'Capability'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=17,
+        opcode=Op.Capability,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -2171,7 +2171,7 @@ def OpCapability(
 
 def OpTypeVoid() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=19,
+        opcode=Op.TypeVoid,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -2180,7 +2180,7 @@ def OpTypeVoid() -> SpirvInstruction:
 
 def OpTypeBool() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=20,
+        opcode=Op.TypeBool,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -2192,7 +2192,7 @@ def OpTypeInt(
     y: int,  # 'Signedness'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=21,
+        opcode=Op.TypeInt,
         args=(x, y),
         hasresult=True,
         hasrtype=False,
@@ -2203,7 +2203,7 @@ def OpTypeFloat(
     x: int,  # 'Width'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=22,
+        opcode=Op.TypeFloat,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -2215,7 +2215,7 @@ def OpTypeVector(
     y: int,  # 'Component Count'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=23,
+        opcode=Op.TypeVector,
         args=(x, y),
         hasresult=True,
         hasrtype=False,
@@ -2227,7 +2227,7 @@ def OpTypeMatrix(
     y: int,  # 'Column Count'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=24,
+        opcode=Op.TypeMatrix,
         args=(x, y),
         hasresult=True,
         hasrtype=False,
@@ -2245,7 +2245,7 @@ def OpTypeImage(
     e: Optional[AccessQualifier] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=25,
+        opcode=Op.TypeImage,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=False,
@@ -2254,7 +2254,7 @@ def OpTypeImage(
 
 def OpTypeSampler() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=26,
+        opcode=Op.TypeSampler,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -2265,7 +2265,7 @@ def OpTypeSampledImage(
     x: SpirvInstruction,  # 'Image Type'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=27,
+        opcode=Op.TypeSampledImage,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -2277,7 +2277,7 @@ def OpTypeArray(
     y: SpirvInstruction,  # 'Length'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=28,
+        opcode=Op.TypeArray,
         args=(x, y),
         hasresult=True,
         hasrtype=False,
@@ -2288,7 +2288,7 @@ def OpTypeRuntimeArray(
     x: SpirvInstruction,  # 'Element Type'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=29,
+        opcode=Op.TypeRuntimeArray,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -2299,7 +2299,7 @@ def OpTypeStruct(
     *x: SpirvInstruction,  # 'Member 0 type', + 'member 1 type', + ...
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=30,
+        opcode=Op.TypeStruct,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -2310,7 +2310,7 @@ def OpTypeOpaque(
     x: str,  # The name of the opaque type.
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=31,
+        opcode=Op.TypeOpaque,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -2322,7 +2322,7 @@ def OpTypePointer(
     y: SpirvInstruction,  # 'Type'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=32,
+        opcode=Op.TypePointer,
         args=(x, y),
         hasresult=True,
         hasrtype=False,
@@ -2334,7 +2334,7 @@ def OpTypeFunction(
     *y: SpirvInstruction,  # 'Parameter 0 Type', + 'Parameter 1 Type', + ...
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=33,
+        opcode=Op.TypeFunction,
         args=(x, y),
         hasresult=True,
         hasrtype=False,
@@ -2343,7 +2343,7 @@ def OpTypeFunction(
 
 def OpTypeEvent() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=34,
+        opcode=Op.TypeEvent,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -2352,7 +2352,7 @@ def OpTypeEvent() -> SpirvInstruction:
 
 def OpTypeDeviceEvent() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=35,
+        opcode=Op.TypeDeviceEvent,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -2361,7 +2361,7 @@ def OpTypeDeviceEvent() -> SpirvInstruction:
 
 def OpTypeReserveId() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=36,
+        opcode=Op.TypeReserveId,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -2370,7 +2370,7 @@ def OpTypeReserveId() -> SpirvInstruction:
 
 def OpTypeQueue() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=37,
+        opcode=Op.TypeQueue,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -2381,7 +2381,7 @@ def OpTypePipe(
     x: AccessQualifier,  # 'Qualifier'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=38,
+        opcode=Op.TypePipe,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -2393,7 +2393,7 @@ def OpTypeForwardPointer(
     y: StorageClass,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=39,
+        opcode=Op.TypeForwardPointer,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -2404,7 +2404,7 @@ def OpConstantTrue(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=41,
+        opcode=Op.ConstantTrue,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -2415,7 +2415,7 @@ def OpConstantFalse(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=42,
+        opcode=Op.ConstantFalse,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -2427,7 +2427,7 @@ def OpConstant(
     x: float,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=43,
+        opcode=Op.Constant,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2439,7 +2439,7 @@ def OpConstantComposite(
     *x: SpirvInstruction,  # 'Constituents'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=44,
+        opcode=Op.ConstantComposite,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2453,7 +2453,7 @@ def OpConstantSampler(
     z: SamplerFilterMode,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=45,
+        opcode=Op.ConstantSampler,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2464,7 +2464,7 @@ def OpConstantNull(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=46,
+        opcode=Op.ConstantNull,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -2475,7 +2475,7 @@ def OpSpecConstantTrue(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=48,
+        opcode=Op.SpecConstantTrue,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -2486,7 +2486,7 @@ def OpSpecConstantFalse(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=49,
+        opcode=Op.SpecConstantFalse,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -2498,7 +2498,7 @@ def OpSpecConstant(
     x: float,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=50,
+        opcode=Op.SpecConstant,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2510,7 +2510,7 @@ def OpSpecConstantComposite(
     *x: SpirvInstruction,  # 'Constituents'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=51,
+        opcode=Op.SpecConstantComposite,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2522,7 +2522,7 @@ def OpSpecConstantOp(
     x: int,  # 'Opcode'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=52,
+        opcode=Op.SpecConstantOp,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2535,7 +2535,7 @@ def OpFunction(
     y: SpirvInstruction,  # 'Function Type'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=54,
+        opcode=Op.Function,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2546,7 +2546,7 @@ def OpFunctionParameter(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=55,
+        opcode=Op.FunctionParameter,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -2555,7 +2555,7 @@ def OpFunctionParameter(
 
 def OpFunctionEnd() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=56,
+        opcode=Op.FunctionEnd,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -2568,7 +2568,7 @@ def OpFunctionCall(
     *y: SpirvInstruction,  # 'Argument 0', + 'Argument 1', + ...
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=57,
+        opcode=Op.FunctionCall,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2581,7 +2581,7 @@ def OpVariable(
     y: Optional[SpirvInstruction] = None,  # 'Initializer'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=59,
+        opcode=Op.Variable,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2595,7 +2595,7 @@ def OpImageTexelPointer(
     z: SpirvInstruction,  # 'Sample'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=60,
+        opcode=Op.ImageTexelPointer,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2608,7 +2608,7 @@ def OpLoad(
     y: Optional[MemoryAccess] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=61,
+        opcode=Op.Load,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2621,7 +2621,7 @@ def OpStore(
     z: Optional[MemoryAccess] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=62,
+        opcode=Op.Store,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -2635,7 +2635,7 @@ def OpCopyMemory(
     a: Optional[MemoryAccess] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=63,
+        opcode=Op.CopyMemory,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -2650,7 +2650,7 @@ def OpCopyMemorySized(
     b: Optional[MemoryAccess] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=64,
+        opcode=Op.CopyMemorySized,
         args=(x, y, z, a, b),
         hasresult=False,
         hasrtype=False,
@@ -2663,7 +2663,7 @@ def OpAccessChain(
     *y: SpirvInstruction,  # 'Indexes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=65,
+        opcode=Op.AccessChain,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2676,7 +2676,7 @@ def OpInBoundsAccessChain(
     *y: SpirvInstruction,  # 'Indexes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=66,
+        opcode=Op.InBoundsAccessChain,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2690,7 +2690,7 @@ def OpPtrAccessChain(
     *z: SpirvInstruction,  # 'Indexes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=67,
+        opcode=Op.PtrAccessChain,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2703,7 +2703,7 @@ def OpArrayLength(
     y: int,  # 'Array member'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=68,
+        opcode=Op.ArrayLength,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2715,7 +2715,7 @@ def OpGenericPtrMemSemantics(
     x: SpirvInstruction,  # 'Pointer'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=69,
+        opcode=Op.GenericPtrMemSemantics,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2729,7 +2729,7 @@ def OpInBoundsPtrAccessChain(
     *z: SpirvInstruction,  # 'Indexes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=70,
+        opcode=Op.InBoundsPtrAccessChain,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2741,7 +2741,7 @@ def OpDecorate(
     y: Decoration,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=71,
+        opcode=Op.Decorate,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -2754,7 +2754,7 @@ def OpMemberDecorate(
     z: Decoration,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=72,
+        opcode=Op.MemberDecorate,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -2763,7 +2763,7 @@ def OpMemberDecorate(
 
 def OpDecorationGroup() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=73,
+        opcode=Op.DecorationGroup,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -2775,7 +2775,7 @@ def OpGroupDecorate(
     *y: SpirvInstruction,  # 'Targets'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=74,
+        opcode=Op.GroupDecorate,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -2787,7 +2787,7 @@ def OpGroupMemberDecorate(
     *y: tuple[SpirvInstruction, int],  # 'Targets'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=75,
+        opcode=Op.GroupMemberDecorate,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -2800,7 +2800,7 @@ def OpVectorExtractDynamic(
     y: SpirvInstruction,  # 'Index'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=77,
+        opcode=Op.VectorExtractDynamic,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2814,7 +2814,7 @@ def OpVectorInsertDynamic(
     z: SpirvInstruction,  # 'Index'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=78,
+        opcode=Op.VectorInsertDynamic,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2828,7 +2828,7 @@ def OpVectorShuffle(
     *z: int,  # 'Components'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=79,
+        opcode=Op.VectorShuffle,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2840,7 +2840,7 @@ def OpCompositeConstruct(
     *x: SpirvInstruction,  # 'Constituents'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=80,
+        opcode=Op.CompositeConstruct,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2853,7 +2853,7 @@ def OpCompositeExtract(
     *y: int,  # 'Indexes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=81,
+        opcode=Op.CompositeExtract,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2867,7 +2867,7 @@ def OpCompositeInsert(
     *z: int,  # 'Indexes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=82,
+        opcode=Op.CompositeInsert,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2879,7 +2879,7 @@ def OpCopyObject(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=83,
+        opcode=Op.CopyObject,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2891,7 +2891,7 @@ def OpTranspose(
     x: SpirvInstruction,  # 'Matrix'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=84,
+        opcode=Op.Transpose,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -2904,7 +2904,7 @@ def OpSampledImage(
     y: SpirvInstruction,  # 'Sampler'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=86,
+        opcode=Op.SampledImage,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -2918,7 +2918,7 @@ def OpImageSampleImplicitLod(
     z: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=87,
+        opcode=Op.ImageSampleImplicitLod,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2932,7 +2932,7 @@ def OpImageSampleExplicitLod(
     z: ImageOperands,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=88,
+        opcode=Op.ImageSampleExplicitLod,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2947,7 +2947,7 @@ def OpImageSampleDrefImplicitLod(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=89,
+        opcode=Op.ImageSampleDrefImplicitLod,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -2962,7 +2962,7 @@ def OpImageSampleDrefExplicitLod(
     a: ImageOperands,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=90,
+        opcode=Op.ImageSampleDrefExplicitLod,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -2976,7 +2976,7 @@ def OpImageSampleProjImplicitLod(
     z: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=91,
+        opcode=Op.ImageSampleProjImplicitLod,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -2990,7 +2990,7 @@ def OpImageSampleProjExplicitLod(
     z: ImageOperands,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=92,
+        opcode=Op.ImageSampleProjExplicitLod,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -3005,7 +3005,7 @@ def OpImageSampleProjDrefImplicitLod(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=93,
+        opcode=Op.ImageSampleProjDrefImplicitLod,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -3020,7 +3020,7 @@ def OpImageSampleProjDrefExplicitLod(
     a: ImageOperands,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=94,
+        opcode=Op.ImageSampleProjDrefExplicitLod,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -3034,7 +3034,7 @@ def OpImageFetch(
     z: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=95,
+        opcode=Op.ImageFetch,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -3049,7 +3049,7 @@ def OpImageGather(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=96,
+        opcode=Op.ImageGather,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -3064,7 +3064,7 @@ def OpImageDrefGather(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=97,
+        opcode=Op.ImageDrefGather,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -3078,7 +3078,7 @@ def OpImageRead(
     z: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=98,
+        opcode=Op.ImageRead,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -3092,7 +3092,7 @@ def OpImageWrite(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=99,
+        opcode=Op.ImageWrite,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -3104,7 +3104,7 @@ def OpImage(
     x: SpirvInstruction,  # 'Sampled Image'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=100,
+        opcode=Op.Image,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3116,7 +3116,7 @@ def OpImageQueryFormat(
     x: SpirvInstruction,  # 'Image'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=101,
+        opcode=Op.ImageQueryFormat,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3128,7 +3128,7 @@ def OpImageQueryOrder(
     x: SpirvInstruction,  # 'Image'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=102,
+        opcode=Op.ImageQueryOrder,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3141,7 +3141,7 @@ def OpImageQuerySizeLod(
     y: SpirvInstruction,  # 'Level of Detail'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=103,
+        opcode=Op.ImageQuerySizeLod,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3153,7 +3153,7 @@ def OpImageQuerySize(
     x: SpirvInstruction,  # 'Image'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=104,
+        opcode=Op.ImageQuerySize,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3166,7 +3166,7 @@ def OpImageQueryLod(
     y: SpirvInstruction,  # 'Coordinate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=105,
+        opcode=Op.ImageQueryLod,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3178,7 +3178,7 @@ def OpImageQueryLevels(
     x: SpirvInstruction,  # 'Image'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=106,
+        opcode=Op.ImageQueryLevels,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3190,7 +3190,7 @@ def OpImageQuerySamples(
     x: SpirvInstruction,  # 'Image'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=107,
+        opcode=Op.ImageQuerySamples,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3202,7 +3202,7 @@ def OpConvertFToU(
     x: SpirvInstruction,  # 'Float Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=109,
+        opcode=Op.ConvertFToU,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3214,7 +3214,7 @@ def OpConvertFToS(
     x: SpirvInstruction,  # 'Float Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=110,
+        opcode=Op.ConvertFToS,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3226,7 +3226,7 @@ def OpConvertSToF(
     x: SpirvInstruction,  # 'Signed Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=111,
+        opcode=Op.ConvertSToF,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3238,7 +3238,7 @@ def OpConvertUToF(
     x: SpirvInstruction,  # 'Unsigned Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=112,
+        opcode=Op.ConvertUToF,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3250,7 +3250,7 @@ def OpUConvert(
     x: SpirvInstruction,  # 'Unsigned Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=113,
+        opcode=Op.UConvert,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3262,7 +3262,7 @@ def OpSConvert(
     x: SpirvInstruction,  # 'Signed Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=114,
+        opcode=Op.SConvert,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3274,7 +3274,7 @@ def OpFConvert(
     x: SpirvInstruction,  # 'Float Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=115,
+        opcode=Op.FConvert,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3286,7 +3286,7 @@ def OpQuantizeToF16(
     x: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=116,
+        opcode=Op.QuantizeToF16,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3298,7 +3298,7 @@ def OpConvertPtrToU(
     x: SpirvInstruction,  # 'Pointer'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=117,
+        opcode=Op.ConvertPtrToU,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3310,7 +3310,7 @@ def OpSatConvertSToU(
     x: SpirvInstruction,  # 'Signed Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=118,
+        opcode=Op.SatConvertSToU,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3322,7 +3322,7 @@ def OpSatConvertUToS(
     x: SpirvInstruction,  # 'Unsigned Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=119,
+        opcode=Op.SatConvertUToS,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3334,7 +3334,7 @@ def OpConvertUToPtr(
     x: SpirvInstruction,  # 'Integer Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=120,
+        opcode=Op.ConvertUToPtr,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3346,7 +3346,7 @@ def OpPtrCastToGeneric(
     x: SpirvInstruction,  # 'Pointer'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=121,
+        opcode=Op.PtrCastToGeneric,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3358,7 +3358,7 @@ def OpGenericCastToPtr(
     x: SpirvInstruction,  # 'Pointer'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=122,
+        opcode=Op.GenericCastToPtr,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3371,7 +3371,7 @@ def OpGenericCastToPtrExplicit(
     y: StorageClass,  # 'Storage'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=123,
+        opcode=Op.GenericCastToPtrExplicit,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3383,7 +3383,7 @@ def OpBitcast(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=124,
+        opcode=Op.Bitcast,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3395,7 +3395,7 @@ def OpSNegate(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=126,
+        opcode=Op.SNegate,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3407,7 +3407,7 @@ def OpFNegate(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=127,
+        opcode=Op.FNegate,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3420,7 +3420,7 @@ def OpIAdd(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=128,
+        opcode=Op.IAdd,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3433,7 +3433,7 @@ def OpFAdd(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=129,
+        opcode=Op.FAdd,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3446,7 +3446,7 @@ def OpISub(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=130,
+        opcode=Op.ISub,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3459,7 +3459,7 @@ def OpFSub(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=131,
+        opcode=Op.FSub,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3472,7 +3472,7 @@ def OpIMul(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=132,
+        opcode=Op.IMul,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3485,7 +3485,7 @@ def OpFMul(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=133,
+        opcode=Op.FMul,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3498,7 +3498,7 @@ def OpUDiv(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=134,
+        opcode=Op.UDiv,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3511,7 +3511,7 @@ def OpSDiv(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=135,
+        opcode=Op.SDiv,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3524,7 +3524,7 @@ def OpFDiv(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=136,
+        opcode=Op.FDiv,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3537,7 +3537,7 @@ def OpUMod(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=137,
+        opcode=Op.UMod,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3550,7 +3550,7 @@ def OpSRem(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=138,
+        opcode=Op.SRem,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3563,7 +3563,7 @@ def OpSMod(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=139,
+        opcode=Op.SMod,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3576,7 +3576,7 @@ def OpFRem(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=140,
+        opcode=Op.FRem,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3589,7 +3589,7 @@ def OpFMod(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=141,
+        opcode=Op.FMod,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3602,7 +3602,7 @@ def OpVectorTimesScalar(
     y: SpirvInstruction,  # 'Scalar'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=142,
+        opcode=Op.VectorTimesScalar,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3615,7 +3615,7 @@ def OpMatrixTimesScalar(
     y: SpirvInstruction,  # 'Scalar'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=143,
+        opcode=Op.MatrixTimesScalar,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3628,7 +3628,7 @@ def OpVectorTimesMatrix(
     y: SpirvInstruction,  # 'Matrix'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=144,
+        opcode=Op.VectorTimesMatrix,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3641,7 +3641,7 @@ def OpMatrixTimesVector(
     y: SpirvInstruction,  # 'Vector'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=145,
+        opcode=Op.MatrixTimesVector,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3654,7 +3654,7 @@ def OpMatrixTimesMatrix(
     y: SpirvInstruction,  # 'RightMatrix'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=146,
+        opcode=Op.MatrixTimesMatrix,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3667,7 +3667,7 @@ def OpOuterProduct(
     y: SpirvInstruction,  # 'Vector 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=147,
+        opcode=Op.OuterProduct,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3680,7 +3680,7 @@ def OpDot(
     y: SpirvInstruction,  # 'Vector 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=148,
+        opcode=Op.Dot,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3693,7 +3693,7 @@ def OpIAddCarry(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=149,
+        opcode=Op.IAddCarry,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3706,7 +3706,7 @@ def OpISubBorrow(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=150,
+        opcode=Op.ISubBorrow,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3719,7 +3719,7 @@ def OpUMulExtended(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=151,
+        opcode=Op.UMulExtended,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3732,7 +3732,7 @@ def OpSMulExtended(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=152,
+        opcode=Op.SMulExtended,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3744,7 +3744,7 @@ def OpAny(
     x: SpirvInstruction,  # 'Vector'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=154,
+        opcode=Op.Any,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3756,7 +3756,7 @@ def OpAll(
     x: SpirvInstruction,  # 'Vector'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=155,
+        opcode=Op.All,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3768,7 +3768,7 @@ def OpIsNan(
     x: SpirvInstruction,  # 'x'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=156,
+        opcode=Op.IsNan,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3780,7 +3780,7 @@ def OpIsInf(
     x: SpirvInstruction,  # 'x'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=157,
+        opcode=Op.IsInf,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3792,7 +3792,7 @@ def OpIsFinite(
     x: SpirvInstruction,  # 'x'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=158,
+        opcode=Op.IsFinite,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3804,7 +3804,7 @@ def OpIsNormal(
     x: SpirvInstruction,  # 'x'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=159,
+        opcode=Op.IsNormal,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3816,7 +3816,7 @@ def OpSignBitSet(
     x: SpirvInstruction,  # 'x'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=160,
+        opcode=Op.SignBitSet,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3829,7 +3829,7 @@ def OpLessOrGreater(
     y: SpirvInstruction,  # 'y'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=161,
+        opcode=Op.LessOrGreater,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3842,7 +3842,7 @@ def OpOrdered(
     y: SpirvInstruction,  # 'y'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=162,
+        opcode=Op.Ordered,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3855,7 +3855,7 @@ def OpUnordered(
     y: SpirvInstruction,  # 'y'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=163,
+        opcode=Op.Unordered,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3868,7 +3868,7 @@ def OpLogicalEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=164,
+        opcode=Op.LogicalEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3881,7 +3881,7 @@ def OpLogicalNotEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=165,
+        opcode=Op.LogicalNotEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3894,7 +3894,7 @@ def OpLogicalOr(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=166,
+        opcode=Op.LogicalOr,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3907,7 +3907,7 @@ def OpLogicalAnd(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=167,
+        opcode=Op.LogicalAnd,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3919,7 +3919,7 @@ def OpLogicalNot(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=168,
+        opcode=Op.LogicalNot,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -3933,7 +3933,7 @@ def OpSelect(
     z: SpirvInstruction,  # 'Object 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=169,
+        opcode=Op.Select,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -3946,7 +3946,7 @@ def OpIEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=170,
+        opcode=Op.IEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3959,7 +3959,7 @@ def OpINotEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=171,
+        opcode=Op.INotEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3972,7 +3972,7 @@ def OpUGreaterThan(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=172,
+        opcode=Op.UGreaterThan,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3985,7 +3985,7 @@ def OpSGreaterThan(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=173,
+        opcode=Op.SGreaterThan,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -3998,7 +3998,7 @@ def OpUGreaterThanEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=174,
+        opcode=Op.UGreaterThanEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4011,7 +4011,7 @@ def OpSGreaterThanEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=175,
+        opcode=Op.SGreaterThanEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4024,7 +4024,7 @@ def OpULessThan(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=176,
+        opcode=Op.ULessThan,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4037,7 +4037,7 @@ def OpSLessThan(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=177,
+        opcode=Op.SLessThan,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4050,7 +4050,7 @@ def OpULessThanEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=178,
+        opcode=Op.ULessThanEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4063,7 +4063,7 @@ def OpSLessThanEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=179,
+        opcode=Op.SLessThanEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4076,7 +4076,7 @@ def OpFOrdEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=180,
+        opcode=Op.FOrdEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4089,7 +4089,7 @@ def OpFUnordEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=181,
+        opcode=Op.FUnordEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4102,7 +4102,7 @@ def OpFOrdNotEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=182,
+        opcode=Op.FOrdNotEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4115,7 +4115,7 @@ def OpFUnordNotEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=183,
+        opcode=Op.FUnordNotEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4128,7 +4128,7 @@ def OpFOrdLessThan(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=184,
+        opcode=Op.FOrdLessThan,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4141,7 +4141,7 @@ def OpFUnordLessThan(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=185,
+        opcode=Op.FUnordLessThan,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4154,7 +4154,7 @@ def OpFOrdGreaterThan(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=186,
+        opcode=Op.FOrdGreaterThan,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4167,7 +4167,7 @@ def OpFUnordGreaterThan(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=187,
+        opcode=Op.FUnordGreaterThan,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4180,7 +4180,7 @@ def OpFOrdLessThanEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=188,
+        opcode=Op.FOrdLessThanEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4193,7 +4193,7 @@ def OpFUnordLessThanEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=189,
+        opcode=Op.FUnordLessThanEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4206,7 +4206,7 @@ def OpFOrdGreaterThanEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=190,
+        opcode=Op.FOrdGreaterThanEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4219,7 +4219,7 @@ def OpFUnordGreaterThanEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=191,
+        opcode=Op.FUnordGreaterThanEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4232,7 +4232,7 @@ def OpShiftRightLogical(
     y: SpirvInstruction,  # 'Shift'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=194,
+        opcode=Op.ShiftRightLogical,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4245,7 +4245,7 @@ def OpShiftRightArithmetic(
     y: SpirvInstruction,  # 'Shift'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=195,
+        opcode=Op.ShiftRightArithmetic,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4258,7 +4258,7 @@ def OpShiftLeftLogical(
     y: SpirvInstruction,  # 'Shift'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=196,
+        opcode=Op.ShiftLeftLogical,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4271,7 +4271,7 @@ def OpBitwiseOr(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=197,
+        opcode=Op.BitwiseOr,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4284,7 +4284,7 @@ def OpBitwiseXor(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=198,
+        opcode=Op.BitwiseXor,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4297,7 +4297,7 @@ def OpBitwiseAnd(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=199,
+        opcode=Op.BitwiseAnd,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4309,7 +4309,7 @@ def OpNot(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=200,
+        opcode=Op.Not,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4324,7 +4324,7 @@ def OpBitFieldInsert(
     a: SpirvInstruction,  # 'Count'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=201,
+        opcode=Op.BitFieldInsert,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4338,7 +4338,7 @@ def OpBitFieldSExtract(
     z: SpirvInstruction,  # 'Count'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=202,
+        opcode=Op.BitFieldSExtract,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -4352,7 +4352,7 @@ def OpBitFieldUExtract(
     z: SpirvInstruction,  # 'Count'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=203,
+        opcode=Op.BitFieldUExtract,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -4364,7 +4364,7 @@ def OpBitReverse(
     x: SpirvInstruction,  # 'Base'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=204,
+        opcode=Op.BitReverse,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4376,7 +4376,7 @@ def OpBitCount(
     x: SpirvInstruction,  # 'Base'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=205,
+        opcode=Op.BitCount,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4388,7 +4388,7 @@ def OpDPdx(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=207,
+        opcode=Op.DPdx,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4400,7 +4400,7 @@ def OpDPdy(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=208,
+        opcode=Op.DPdy,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4412,7 +4412,7 @@ def OpFwidth(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=209,
+        opcode=Op.Fwidth,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4424,7 +4424,7 @@ def OpDPdxFine(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=210,
+        opcode=Op.DPdxFine,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4436,7 +4436,7 @@ def OpDPdyFine(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=211,
+        opcode=Op.DPdyFine,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4448,7 +4448,7 @@ def OpFwidthFine(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=212,
+        opcode=Op.FwidthFine,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4460,7 +4460,7 @@ def OpDPdxCoarse(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=213,
+        opcode=Op.DPdxCoarse,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4472,7 +4472,7 @@ def OpDPdyCoarse(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=214,
+        opcode=Op.DPdyCoarse,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4484,7 +4484,7 @@ def OpFwidthCoarse(
     x: SpirvInstruction,  # 'P'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=215,
+        opcode=Op.FwidthCoarse,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4493,7 +4493,7 @@ def OpFwidthCoarse(
 
 def OpEmitVertex() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=218,
+        opcode=Op.EmitVertex,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -4502,7 +4502,7 @@ def OpEmitVertex() -> SpirvInstruction:
 
 def OpEndPrimitive() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=219,
+        opcode=Op.EndPrimitive,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -4513,7 +4513,7 @@ def OpEmitStreamVertex(
     x: SpirvInstruction,  # 'Stream'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=220,
+        opcode=Op.EmitStreamVertex,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -4524,7 +4524,7 @@ def OpEndStreamPrimitive(
     x: SpirvInstruction,  # 'Stream'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=221,
+        opcode=Op.EndStreamPrimitive,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -4537,7 +4537,7 @@ def OpControlBarrier(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=224,
+        opcode=Op.ControlBarrier,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -4549,7 +4549,7 @@ def OpMemoryBarrier(
     y: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=225,
+        opcode=Op.MemoryBarrier,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -4563,7 +4563,7 @@ def OpAtomicLoad(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=227,
+        opcode=Op.AtomicLoad,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -4577,7 +4577,7 @@ def OpAtomicStore(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=228,
+        opcode=Op.AtomicStore,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -4592,7 +4592,7 @@ def OpAtomicExchange(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=229,
+        opcode=Op.AtomicExchange,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4609,7 +4609,7 @@ def OpAtomicCompareExchange(
     c: SpirvInstruction,  # 'Comparator'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=230,
+        opcode=Op.AtomicCompareExchange,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -4626,7 +4626,7 @@ def OpAtomicCompareExchangeWeak(
     c: SpirvInstruction,  # 'Comparator'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=231,
+        opcode=Op.AtomicCompareExchangeWeak,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -4640,7 +4640,7 @@ def OpAtomicIIncrement(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=232,
+        opcode=Op.AtomicIIncrement,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -4654,7 +4654,7 @@ def OpAtomicIDecrement(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=233,
+        opcode=Op.AtomicIDecrement,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -4669,7 +4669,7 @@ def OpAtomicIAdd(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=234,
+        opcode=Op.AtomicIAdd,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4684,7 +4684,7 @@ def OpAtomicISub(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=235,
+        opcode=Op.AtomicISub,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4699,7 +4699,7 @@ def OpAtomicSMin(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=236,
+        opcode=Op.AtomicSMin,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4714,7 +4714,7 @@ def OpAtomicUMin(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=237,
+        opcode=Op.AtomicUMin,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4729,7 +4729,7 @@ def OpAtomicSMax(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=238,
+        opcode=Op.AtomicSMax,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4744,7 +4744,7 @@ def OpAtomicUMax(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=239,
+        opcode=Op.AtomicUMax,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4759,7 +4759,7 @@ def OpAtomicAnd(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=240,
+        opcode=Op.AtomicAnd,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4774,7 +4774,7 @@ def OpAtomicOr(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=241,
+        opcode=Op.AtomicOr,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4789,7 +4789,7 @@ def OpAtomicXor(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=242,
+        opcode=Op.AtomicXor,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -4801,7 +4801,7 @@ def OpPhi(
     *x: tuple[SpirvInstruction, SpirvInstruction],  # 'Variable, Parent, ...'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=245,
+        opcode=Op.Phi,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -4814,7 +4814,7 @@ def OpLoopMerge(
     z: LoopControl,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=246,
+        opcode=Op.LoopMerge,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -4826,7 +4826,7 @@ def OpSelectionMerge(
     y: SelectionControl,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=247,
+        opcode=Op.SelectionMerge,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -4835,7 +4835,7 @@ def OpSelectionMerge(
 
 def OpLabel() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=248,
+        opcode=Op.Label,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -4846,7 +4846,7 @@ def OpBranch(
     x: SpirvInstruction,  # 'Target Label'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=249,
+        opcode=Op.Branch,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -4860,7 +4860,7 @@ def OpBranchConditional(
     *a: int,  # 'Branch weights'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=250,
+        opcode=Op.BranchConditional,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -4873,7 +4873,7 @@ def OpSwitch(
     *z: tuple[int, SpirvInstruction],  # 'Target'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=251,
+        opcode=Op.Switch,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -4882,7 +4882,7 @@ def OpSwitch(
 
 def OpKill() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=252,
+        opcode=Op.Kill,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -4891,7 +4891,7 @@ def OpKill() -> SpirvInstruction:
 
 def OpReturn() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=253,
+        opcode=Op.Return,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -4902,7 +4902,7 @@ def OpReturnValue(
     x: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=254,
+        opcode=Op.ReturnValue,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -4911,7 +4911,7 @@ def OpReturnValue(
 
 def OpUnreachable() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=255,
+        opcode=Op.Unreachable,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -4923,7 +4923,7 @@ def OpLifetimeStart(
     y: int,  # 'Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=256,
+        opcode=Op.LifetimeStart,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -4935,7 +4935,7 @@ def OpLifetimeStop(
     y: int,  # 'Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=257,
+        opcode=Op.LifetimeStop,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -4952,7 +4952,7 @@ def OpGroupAsyncCopy(
     c: SpirvInstruction,  # 'Event'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=259,
+        opcode=Op.GroupAsyncCopy,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -4965,7 +4965,7 @@ def OpGroupWaitEvents(
     z: SpirvInstruction,  # 'Events List'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=260,
+        opcode=Op.GroupWaitEvents,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -4978,7 +4978,7 @@ def OpGroupAll(
     y: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=261,
+        opcode=Op.GroupAll,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -4991,7 +4991,7 @@ def OpGroupAny(
     y: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=262,
+        opcode=Op.GroupAny,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -5005,7 +5005,7 @@ def OpGroupBroadcast(
     z: SpirvInstruction,  # 'LocalId'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=263,
+        opcode=Op.GroupBroadcast,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5019,7 +5019,7 @@ def OpGroupIAdd(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=264,
+        opcode=Op.GroupIAdd,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5033,7 +5033,7 @@ def OpGroupFAdd(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=265,
+        opcode=Op.GroupFAdd,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5047,7 +5047,7 @@ def OpGroupFMin(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=266,
+        opcode=Op.GroupFMin,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5061,7 +5061,7 @@ def OpGroupUMin(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=267,
+        opcode=Op.GroupUMin,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5075,7 +5075,7 @@ def OpGroupSMin(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=268,
+        opcode=Op.GroupSMin,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5089,7 +5089,7 @@ def OpGroupFMax(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=269,
+        opcode=Op.GroupFMax,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5103,7 +5103,7 @@ def OpGroupUMax(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=270,
+        opcode=Op.GroupUMax,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5117,7 +5117,7 @@ def OpGroupSMax(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=271,
+        opcode=Op.GroupSMax,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5132,7 +5132,7 @@ def OpReadPipe(
     a: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=274,
+        opcode=Op.ReadPipe,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5147,7 +5147,7 @@ def OpWritePipe(
     a: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=275,
+        opcode=Op.WritePipe,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5164,7 +5164,7 @@ def OpReservedReadPipe(
     c: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=276,
+        opcode=Op.ReservedReadPipe,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -5181,7 +5181,7 @@ def OpReservedWritePipe(
     c: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=277,
+        opcode=Op.ReservedWritePipe,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -5196,7 +5196,7 @@ def OpReserveReadPipePackets(
     a: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=278,
+        opcode=Op.ReserveReadPipePackets,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5211,7 +5211,7 @@ def OpReserveWritePipePackets(
     a: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=279,
+        opcode=Op.ReserveWritePipePackets,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5225,7 +5225,7 @@ def OpCommitReadPipe(
     a: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=280,
+        opcode=Op.CommitReadPipe,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -5239,7 +5239,7 @@ def OpCommitWritePipe(
     a: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=281,
+        opcode=Op.CommitWritePipe,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -5251,7 +5251,7 @@ def OpIsValidReserveId(
     x: SpirvInstruction,  # 'Reserve Id'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=282,
+        opcode=Op.IsValidReserveId,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -5265,7 +5265,7 @@ def OpGetNumPipePackets(
     z: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=283,
+        opcode=Op.GetNumPipePackets,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5279,7 +5279,7 @@ def OpGetMaxPipePackets(
     z: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=284,
+        opcode=Op.GetMaxPipePackets,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5295,7 +5295,7 @@ def OpGroupReserveReadPipePackets(
     b: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=285,
+        opcode=Op.GroupReserveReadPipePackets,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -5311,7 +5311,7 @@ def OpGroupReserveWritePipePackets(
     b: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=286,
+        opcode=Op.GroupReserveWritePipePackets,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -5326,7 +5326,7 @@ def OpGroupCommitReadPipe(
     b: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=287,
+        opcode=Op.GroupCommitReadPipe,
         args=(x, y, z, a, b),
         hasresult=False,
         hasrtype=False,
@@ -5341,7 +5341,7 @@ def OpGroupCommitWritePipe(
     b: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=288,
+        opcode=Op.GroupCommitWritePipe,
         args=(x, y, z, a, b),
         hasresult=False,
         hasrtype=False,
@@ -5356,7 +5356,7 @@ def OpEnqueueMarker(
     a: SpirvInstruction,  # 'Ret Event'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=291,
+        opcode=Op.EnqueueMarker,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5378,7 +5378,7 @@ def OpEnqueueKernel(
     *h: SpirvInstruction,  # 'Local Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=292,
+        opcode=Op.EnqueueKernel,
         args=(x, y, z, a, b, c, d, e, f, g, h),
         hasresult=True,
         hasrtype=True,
@@ -5394,7 +5394,7 @@ def OpGetKernelNDrangeSubGroupCount(
     b: SpirvInstruction,  # 'Param Align'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=293,
+        opcode=Op.GetKernelNDrangeSubGroupCount,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -5410,7 +5410,7 @@ def OpGetKernelNDrangeMaxSubGroupSize(
     b: SpirvInstruction,  # 'Param Align'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=294,
+        opcode=Op.GetKernelNDrangeMaxSubGroupSize,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -5425,7 +5425,7 @@ def OpGetKernelWorkGroupSize(
     a: SpirvInstruction,  # 'Param Align'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=295,
+        opcode=Op.GetKernelWorkGroupSize,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5440,7 +5440,7 @@ def OpGetKernelPreferredWorkGroupSizeMultiple(
     a: SpirvInstruction,  # 'Param Align'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=296,
+        opcode=Op.GetKernelPreferredWorkGroupSizeMultiple,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5451,7 +5451,7 @@ def OpRetainEvent(
     x: SpirvInstruction,  # 'Event'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=297,
+        opcode=Op.RetainEvent,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -5462,7 +5462,7 @@ def OpReleaseEvent(
     x: SpirvInstruction,  # 'Event'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=298,
+        opcode=Op.ReleaseEvent,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -5473,7 +5473,7 @@ def OpCreateUserEvent(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=299,
+        opcode=Op.CreateUserEvent,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -5485,7 +5485,7 @@ def OpIsValidEvent(
     x: SpirvInstruction,  # 'Event'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=300,
+        opcode=Op.IsValidEvent,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -5497,7 +5497,7 @@ def OpSetUserEventStatus(
     y: SpirvInstruction,  # 'Status'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=301,
+        opcode=Op.SetUserEventStatus,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -5510,7 +5510,7 @@ def OpCaptureEventProfilingInfo(
     z: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=302,
+        opcode=Op.CaptureEventProfilingInfo,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -5521,7 +5521,7 @@ def OpGetDefaultQueue(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=303,
+        opcode=Op.GetDefaultQueue,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -5535,7 +5535,7 @@ def OpBuildNDRange(
     z: SpirvInstruction,  # 'GlobalWorkOffset'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=304,
+        opcode=Op.BuildNDRange,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5549,7 +5549,7 @@ def OpImageSparseSampleImplicitLod(
     z: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=305,
+        opcode=Op.ImageSparseSampleImplicitLod,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5563,7 +5563,7 @@ def OpImageSparseSampleExplicitLod(
     z: ImageOperands,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=306,
+        opcode=Op.ImageSparseSampleExplicitLod,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5578,7 +5578,7 @@ def OpImageSparseSampleDrefImplicitLod(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=307,
+        opcode=Op.ImageSparseSampleDrefImplicitLod,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5593,7 +5593,7 @@ def OpImageSparseSampleDrefExplicitLod(
     a: ImageOperands,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=308,
+        opcode=Op.ImageSparseSampleDrefExplicitLod,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5607,7 +5607,7 @@ def OpImageSparseSampleProjImplicitLod(
     z: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=309,
+        opcode=Op.ImageSparseSampleProjImplicitLod,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5621,7 +5621,7 @@ def OpImageSparseSampleProjExplicitLod(
     z: ImageOperands,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=310,
+        opcode=Op.ImageSparseSampleProjExplicitLod,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5636,7 +5636,7 @@ def OpImageSparseSampleProjDrefImplicitLod(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=311,
+        opcode=Op.ImageSparseSampleProjDrefImplicitLod,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5651,7 +5651,7 @@ def OpImageSparseSampleProjDrefExplicitLod(
     a: ImageOperands,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=312,
+        opcode=Op.ImageSparseSampleProjDrefExplicitLod,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5665,7 +5665,7 @@ def OpImageSparseFetch(
     z: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=313,
+        opcode=Op.ImageSparseFetch,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5680,7 +5680,7 @@ def OpImageSparseGather(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=314,
+        opcode=Op.ImageSparseGather,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5695,7 +5695,7 @@ def OpImageSparseDrefGather(
     a: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=315,
+        opcode=Op.ImageSparseDrefGather,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5707,7 +5707,7 @@ def OpImageSparseTexelsResident(
     x: SpirvInstruction,  # 'Resident Code'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=316,
+        opcode=Op.ImageSparseTexelsResident,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -5716,7 +5716,7 @@ def OpImageSparseTexelsResident(
 
 def OpNoLine() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=317,
+        opcode=Op.NoLine,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -5730,7 +5730,7 @@ def OpAtomicFlagTestAndSet(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=318,
+        opcode=Op.AtomicFlagTestAndSet,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5743,7 +5743,7 @@ def OpAtomicFlagClear(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=319,
+        opcode=Op.AtomicFlagClear,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -5757,7 +5757,7 @@ def OpImageSparseRead(
     z: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=320,
+        opcode=Op.ImageSparseRead,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5769,7 +5769,7 @@ def OpSizeOf(
     x: SpirvInstruction,  # 'Pointer'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=321,
+        opcode=Op.SizeOf,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -5778,7 +5778,7 @@ def OpSizeOf(
 
 def OpTypePipeStorage() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=322,
+        opcode=Op.TypePipeStorage,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -5792,7 +5792,7 @@ def OpConstantPipeStorage(
     z: int,  # 'Capacity'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=323,
+        opcode=Op.ConstantPipeStorage,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5804,7 +5804,7 @@ def OpCreatePipeFromPipeStorage(
     x: SpirvInstruction,  # 'Pipe Storage'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=324,
+        opcode=Op.CreatePipeFromPipeStorage,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -5820,7 +5820,7 @@ def OpGetKernelLocalSizeForSubgroupCount(
     b: SpirvInstruction,  # 'Param Align'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=325,
+        opcode=Op.GetKernelLocalSizeForSubgroupCount,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -5835,7 +5835,7 @@ def OpGetKernelMaxNumSubgroups(
     a: SpirvInstruction,  # 'Param Align'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=326,
+        opcode=Op.GetKernelMaxNumSubgroups,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -5844,7 +5844,7 @@ def OpGetKernelMaxNumSubgroups(
 
 def OpTypeNamedBarrier() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=327,
+        opcode=Op.TypeNamedBarrier,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -5856,7 +5856,7 @@ def OpNamedBarrierInitialize(
     x: SpirvInstruction,  # 'Subgroup Count'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=328,
+        opcode=Op.NamedBarrierInitialize,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -5869,7 +5869,7 @@ def OpMemoryNamedBarrier(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=329,
+        opcode=Op.MemoryNamedBarrier,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -5880,7 +5880,7 @@ def OpModuleProcessed(
     x: str,  # 'Process'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=330,
+        opcode=Op.ModuleProcessed,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -5892,7 +5892,7 @@ def OpExecutionModeId(
     y: ExecutionMode,  # 'Mode'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=331,
+        opcode=Op.ExecutionModeId,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -5904,7 +5904,7 @@ def OpDecorateId(
     y: Decoration,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=332,
+        opcode=Op.DecorateId,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -5916,7 +5916,7 @@ def OpGroupNonUniformElect(
     x: SpirvInstruction,  # 'Execution'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=333,
+        opcode=Op.GroupNonUniformElect,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -5929,7 +5929,7 @@ def OpGroupNonUniformAll(
     y: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=334,
+        opcode=Op.GroupNonUniformAll,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -5942,7 +5942,7 @@ def OpGroupNonUniformAny(
     y: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=335,
+        opcode=Op.GroupNonUniformAny,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -5955,7 +5955,7 @@ def OpGroupNonUniformAllEqual(
     y: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=336,
+        opcode=Op.GroupNonUniformAllEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -5969,7 +5969,7 @@ def OpGroupNonUniformBroadcast(
     z: SpirvInstruction,  # 'Id'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=337,
+        opcode=Op.GroupNonUniformBroadcast,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -5982,7 +5982,7 @@ def OpGroupNonUniformBroadcastFirst(
     y: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=338,
+        opcode=Op.GroupNonUniformBroadcastFirst,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -5995,7 +5995,7 @@ def OpGroupNonUniformBallot(
     y: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=339,
+        opcode=Op.GroupNonUniformBallot,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6008,7 +6008,7 @@ def OpGroupNonUniformInverseBallot(
     y: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=340,
+        opcode=Op.GroupNonUniformInverseBallot,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6022,7 +6022,7 @@ def OpGroupNonUniformBallotBitExtract(
     z: SpirvInstruction,  # 'Index'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=341,
+        opcode=Op.GroupNonUniformBallotBitExtract,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6036,7 +6036,7 @@ def OpGroupNonUniformBallotBitCount(
     z: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=342,
+        opcode=Op.GroupNonUniformBallotBitCount,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6049,7 +6049,7 @@ def OpGroupNonUniformBallotFindLSB(
     y: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=343,
+        opcode=Op.GroupNonUniformBallotFindLSB,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6062,7 +6062,7 @@ def OpGroupNonUniformBallotFindMSB(
     y: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=344,
+        opcode=Op.GroupNonUniformBallotFindMSB,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6076,7 +6076,7 @@ def OpGroupNonUniformShuffle(
     z: SpirvInstruction,  # 'Id'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=345,
+        opcode=Op.GroupNonUniformShuffle,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6090,7 +6090,7 @@ def OpGroupNonUniformShuffleXor(
     z: SpirvInstruction,  # 'Mask'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=346,
+        opcode=Op.GroupNonUniformShuffleXor,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6104,7 +6104,7 @@ def OpGroupNonUniformShuffleUp(
     z: SpirvInstruction,  # 'Delta'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=347,
+        opcode=Op.GroupNonUniformShuffleUp,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6118,7 +6118,7 @@ def OpGroupNonUniformShuffleDown(
     z: SpirvInstruction,  # 'Delta'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=348,
+        opcode=Op.GroupNonUniformShuffleDown,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6133,7 +6133,7 @@ def OpGroupNonUniformIAdd(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=349,
+        opcode=Op.GroupNonUniformIAdd,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6148,7 +6148,7 @@ def OpGroupNonUniformFAdd(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=350,
+        opcode=Op.GroupNonUniformFAdd,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6163,7 +6163,7 @@ def OpGroupNonUniformIMul(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=351,
+        opcode=Op.GroupNonUniformIMul,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6178,7 +6178,7 @@ def OpGroupNonUniformFMul(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=352,
+        opcode=Op.GroupNonUniformFMul,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6193,7 +6193,7 @@ def OpGroupNonUniformSMin(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=353,
+        opcode=Op.GroupNonUniformSMin,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6208,7 +6208,7 @@ def OpGroupNonUniformUMin(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=354,
+        opcode=Op.GroupNonUniformUMin,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6223,7 +6223,7 @@ def OpGroupNonUniformFMin(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=355,
+        opcode=Op.GroupNonUniformFMin,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6238,7 +6238,7 @@ def OpGroupNonUniformSMax(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=356,
+        opcode=Op.GroupNonUniformSMax,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6253,7 +6253,7 @@ def OpGroupNonUniformUMax(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=357,
+        opcode=Op.GroupNonUniformUMax,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6268,7 +6268,7 @@ def OpGroupNonUniformFMax(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=358,
+        opcode=Op.GroupNonUniformFMax,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6283,7 +6283,7 @@ def OpGroupNonUniformBitwiseAnd(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=359,
+        opcode=Op.GroupNonUniformBitwiseAnd,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6298,7 +6298,7 @@ def OpGroupNonUniformBitwiseOr(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=360,
+        opcode=Op.GroupNonUniformBitwiseOr,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6313,7 +6313,7 @@ def OpGroupNonUniformBitwiseXor(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=361,
+        opcode=Op.GroupNonUniformBitwiseXor,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6328,7 +6328,7 @@ def OpGroupNonUniformLogicalAnd(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=362,
+        opcode=Op.GroupNonUniformLogicalAnd,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6343,7 +6343,7 @@ def OpGroupNonUniformLogicalOr(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=363,
+        opcode=Op.GroupNonUniformLogicalOr,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6358,7 +6358,7 @@ def OpGroupNonUniformLogicalXor(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=364,
+        opcode=Op.GroupNonUniformLogicalXor,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6372,7 +6372,7 @@ def OpGroupNonUniformQuadBroadcast(
     z: SpirvInstruction,  # 'Index'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=365,
+        opcode=Op.GroupNonUniformQuadBroadcast,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6386,7 +6386,7 @@ def OpGroupNonUniformQuadSwap(
     z: SpirvInstruction,  # 'Direction'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=366,
+        opcode=Op.GroupNonUniformQuadSwap,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6398,7 +6398,7 @@ def OpCopyLogical(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=400,
+        opcode=Op.CopyLogical,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6411,7 +6411,7 @@ def OpPtrEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=401,
+        opcode=Op.PtrEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6424,7 +6424,7 @@ def OpPtrNotEqual(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=402,
+        opcode=Op.PtrNotEqual,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6437,7 +6437,7 @@ def OpPtrDiff(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=403,
+        opcode=Op.PtrDiff,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6450,7 +6450,7 @@ def OpColorAttachmentReadEXT(
     y: Optional[SpirvInstruction] = None,  # 'Sample'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4160,
+        opcode=Op.ColorAttachmentReadEXT,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6462,7 +6462,7 @@ def OpDepthAttachmentReadEXT(
     x: Optional[SpirvInstruction] = None,  # 'Sample'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4161,
+        opcode=Op.DepthAttachmentReadEXT,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6474,7 +6474,7 @@ def OpStencilAttachmentReadEXT(
     x: Optional[SpirvInstruction] = None,  # 'Sample'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4162,
+        opcode=Op.StencilAttachmentReadEXT,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6483,7 +6483,7 @@ def OpStencilAttachmentReadEXT(
 
 def OpTerminateInvocation() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4416,
+        opcode=Op.TerminateInvocation,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -6495,7 +6495,7 @@ def OpSubgroupBallotKHR(
     x: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4421,
+        opcode=Op.SubgroupBallotKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6507,7 +6507,7 @@ def OpSubgroupFirstInvocationKHR(
     x: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4422,
+        opcode=Op.SubgroupFirstInvocationKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6519,7 +6519,7 @@ def OpSubgroupAllKHR(
     x: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4428,
+        opcode=Op.SubgroupAllKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6531,7 +6531,7 @@ def OpSubgroupAnyKHR(
     x: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4429,
+        opcode=Op.SubgroupAnyKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6543,7 +6543,7 @@ def OpSubgroupAllEqualKHR(
     x: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4430,
+        opcode=Op.SubgroupAllEqualKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6558,7 +6558,7 @@ def OpGroupNonUniformRotateKHR(
     a: Optional[SpirvInstruction] = None,  # 'ClusterSize'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4431,
+        opcode=Op.GroupNonUniformRotateKHR,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6571,7 +6571,7 @@ def OpSubgroupReadInvocationKHR(
     y: SpirvInstruction,  # 'Index'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4432,
+        opcode=Op.SubgroupReadInvocationKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6592,7 +6592,7 @@ def OpTraceRayKHR(
     h: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4445,
+        opcode=Op.TraceRayKHR,
         args=(x, y, z, a, b, c, d, e, f, g, h),
         hasresult=False,
         hasrtype=False,
@@ -6604,7 +6604,7 @@ def OpExecuteCallableKHR(
     y: SpirvInstruction,  # 'Callable Data'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4446,
+        opcode=Op.ExecuteCallableKHR,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -6616,7 +6616,7 @@ def OpConvertUToAccelerationStructureKHR(
     x: SpirvInstruction,  # 'Accel'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4447,
+        opcode=Op.ConvertUToAccelerationStructureKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6625,7 +6625,7 @@ def OpConvertUToAccelerationStructureKHR(
 
 def OpIgnoreIntersectionKHR() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4448,
+        opcode=Op.IgnoreIntersectionKHR,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -6634,7 +6634,7 @@ def OpIgnoreIntersectionKHR() -> SpirvInstruction:
 
 def OpTerminateRayKHR() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4449,
+        opcode=Op.TerminateRayKHR,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -6648,7 +6648,7 @@ def OpSDot(
     z: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4450,
+        opcode=Op.SDot,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6662,7 +6662,7 @@ def OpSDotKHR(
     z: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4450,
+        opcode=Op.SDotKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6676,7 +6676,7 @@ def OpUDot(
     z: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4451,
+        opcode=Op.UDot,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6690,7 +6690,7 @@ def OpUDotKHR(
     z: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4451,
+        opcode=Op.UDotKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6704,7 +6704,7 @@ def OpSUDot(
     z: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4452,
+        opcode=Op.SUDot,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6718,7 +6718,7 @@ def OpSUDotKHR(
     z: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4452,
+        opcode=Op.SUDotKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6733,7 +6733,7 @@ def OpSDotAccSat(
     a: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4453,
+        opcode=Op.SDotAccSat,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6748,7 +6748,7 @@ def OpSDotAccSatKHR(
     a: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4453,
+        opcode=Op.SDotAccSatKHR,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6763,7 +6763,7 @@ def OpUDotAccSat(
     a: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4454,
+        opcode=Op.UDotAccSat,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6778,7 +6778,7 @@ def OpUDotAccSatKHR(
     a: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4454,
+        opcode=Op.UDotAccSatKHR,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6793,7 +6793,7 @@ def OpSUDotAccSat(
     a: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4455,
+        opcode=Op.SUDotAccSat,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6808,7 +6808,7 @@ def OpSUDotAccSatKHR(
     a: Optional[PackedVectorFormat] = None,  # 'Packed Vector Format'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4455,
+        opcode=Op.SUDotAccSatKHR,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6823,7 +6823,7 @@ def OpTypeCooperativeMatrixKHR(
     b: SpirvInstruction,  # 'Use'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4456,
+        opcode=Op.TypeCooperativeMatrixKHR,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=False,
@@ -6838,7 +6838,7 @@ def OpCooperativeMatrixLoadKHR(
     a: Optional[MemoryAccess] = None,  # 'Memory Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4457,
+        opcode=Op.CooperativeMatrixLoadKHR,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6853,7 +6853,7 @@ def OpCooperativeMatrixStoreKHR(
     b: Optional[MemoryAccess] = None,  # 'Memory Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4458,
+        opcode=Op.CooperativeMatrixStoreKHR,
         args=(x, y, z, a, b),
         hasresult=False,
         hasrtype=False,
@@ -6868,7 +6868,7 @@ def OpCooperativeMatrixMulAddKHR(
     a: Optional[CooperativeMatrixOperands] = None,  # 'Cooperative Matrix Operands'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4459,
+        opcode=Op.CooperativeMatrixMulAddKHR,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -6880,7 +6880,7 @@ def OpCooperativeMatrixLengthKHR(
     x: SpirvInstruction,  # 'Type'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4460,
+        opcode=Op.CooperativeMatrixLengthKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6889,7 +6889,7 @@ def OpCooperativeMatrixLengthKHR(
 
 def OpTypeRayQueryKHR() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4472,
+        opcode=Op.TypeRayQueryKHR,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -6907,7 +6907,7 @@ def OpRayQueryInitializeKHR(
     e: SpirvInstruction,  # 'RayTMax'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4473,
+        opcode=Op.RayQueryInitializeKHR,
         args=(x, y, z, a, b, c, d, e),
         hasresult=False,
         hasrtype=False,
@@ -6918,7 +6918,7 @@ def OpRayQueryTerminateKHR(
     x: SpirvInstruction,  # 'RayQuery'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4474,
+        opcode=Op.RayQueryTerminateKHR,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -6930,7 +6930,7 @@ def OpRayQueryGenerateIntersectionKHR(
     y: SpirvInstruction,  # 'HitT'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4475,
+        opcode=Op.RayQueryGenerateIntersectionKHR,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -6941,7 +6941,7 @@ def OpRayQueryConfirmIntersectionKHR(
     x: SpirvInstruction,  # 'RayQuery'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4476,
+        opcode=Op.RayQueryConfirmIntersectionKHR,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -6953,7 +6953,7 @@ def OpRayQueryProceedKHR(
     x: SpirvInstruction,  # 'RayQuery'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4477,
+        opcode=Op.RayQueryProceedKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -6966,7 +6966,7 @@ def OpRayQueryGetIntersectionTypeKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4479,
+        opcode=Op.RayQueryGetIntersectionTypeKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -6980,7 +6980,7 @@ def OpImageSampleWeightedQCOM(
     z: SpirvInstruction,  # 'Weights'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4480,
+        opcode=Op.ImageSampleWeightedQCOM,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -6994,7 +6994,7 @@ def OpImageBoxFilterQCOM(
     z: SpirvInstruction,  # 'Box Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4481,
+        opcode=Op.ImageBoxFilterQCOM,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7010,7 +7010,7 @@ def OpImageBlockMatchSSDQCOM(
     b: SpirvInstruction,  # 'Block Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4482,
+        opcode=Op.ImageBlockMatchSSDQCOM,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7026,7 +7026,7 @@ def OpImageBlockMatchSADQCOM(
     b: SpirvInstruction,  # 'Block Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4483,
+        opcode=Op.ImageBlockMatchSADQCOM,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7042,7 +7042,7 @@ def OpImageBlockMatchWindowSSDQCOM(
     b: SpirvInstruction,  # 'Block Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4500,
+        opcode=Op.ImageBlockMatchWindowSSDQCOM,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7058,7 +7058,7 @@ def OpImageBlockMatchWindowSADQCOM(
     b: SpirvInstruction,  # 'Block Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4501,
+        opcode=Op.ImageBlockMatchWindowSADQCOM,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7074,7 +7074,7 @@ def OpImageBlockMatchGatherSSDQCOM(
     b: SpirvInstruction,  # 'Block Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4502,
+        opcode=Op.ImageBlockMatchGatherSSDQCOM,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7090,7 +7090,7 @@ def OpImageBlockMatchGatherSADQCOM(
     b: SpirvInstruction,  # 'Block Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=4503,
+        opcode=Op.ImageBlockMatchGatherSADQCOM,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7104,7 +7104,7 @@ def OpGroupIAddNonUniformAMD(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5000,
+        opcode=Op.GroupIAddNonUniformAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7118,7 +7118,7 @@ def OpGroupFAddNonUniformAMD(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5001,
+        opcode=Op.GroupFAddNonUniformAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7132,7 +7132,7 @@ def OpGroupFMinNonUniformAMD(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5002,
+        opcode=Op.GroupFMinNonUniformAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7146,7 +7146,7 @@ def OpGroupUMinNonUniformAMD(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5003,
+        opcode=Op.GroupUMinNonUniformAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7160,7 +7160,7 @@ def OpGroupSMinNonUniformAMD(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5004,
+        opcode=Op.GroupSMinNonUniformAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7174,7 +7174,7 @@ def OpGroupFMaxNonUniformAMD(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5005,
+        opcode=Op.GroupFMaxNonUniformAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7188,7 +7188,7 @@ def OpGroupUMaxNonUniformAMD(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5006,
+        opcode=Op.GroupUMaxNonUniformAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7202,7 +7202,7 @@ def OpGroupSMaxNonUniformAMD(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5007,
+        opcode=Op.GroupSMaxNonUniformAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7215,7 +7215,7 @@ def OpFragmentMaskFetchAMD(
     y: SpirvInstruction,  # 'Coordinate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5011,
+        opcode=Op.FragmentMaskFetchAMD,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -7229,7 +7229,7 @@ def OpFragmentFetchAMD(
     z: SpirvInstruction,  # 'Fragment Index'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5012,
+        opcode=Op.FragmentFetchAMD,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -7241,7 +7241,7 @@ def OpReadClockKHR(
     x: SpirvInstruction,  # 'Scope'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5056,
+        opcode=Op.ReadClockKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7252,7 +7252,7 @@ def OpFinalizeNodePayloadsAMDX(
     x: SpirvInstruction,  # 'Payload Array'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5075,
+        opcode=Op.FinalizeNodePayloadsAMDX,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -7264,7 +7264,7 @@ def OpFinishWritingNodePayloadAMDX(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5078,
+        opcode=Op.FinishWritingNodePayloadAMDX,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7278,7 +7278,7 @@ def OpInitializeNodePayloadsAMDX(
     a: SpirvInstruction,  # 'Node Index'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5090,
+        opcode=Op.InitializeNodePayloadsAMDX,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -7290,7 +7290,7 @@ def OpGroupNonUniformQuadAllKHR(
     x: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5110,
+        opcode=Op.GroupNonUniformQuadAllKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7302,7 +7302,7 @@ def OpGroupNonUniformQuadAnyKHR(
     x: SpirvInstruction,  # 'Predicate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5111,
+        opcode=Op.GroupNonUniformQuadAnyKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7326,7 +7326,7 @@ def OpHitObjectRecordHitMotionNV(
     k: SpirvInstruction,  # 'HitObject Attributes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5249,
+        opcode=Op.HitObjectRecordHitMotionNV,
         args=(x, y, z, a, b, c, d, e, f, g, h, i, j, k),
         hasresult=False,
         hasrtype=False,
@@ -7349,7 +7349,7 @@ def OpHitObjectRecordHitWithIndexMotionNV(
     j: SpirvInstruction,  # 'HitObject Attributes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5250,
+        opcode=Op.HitObjectRecordHitWithIndexMotionNV,
         args=(x, y, z, a, b, c, d, e, f, g, h, i, j),
         hasresult=False,
         hasrtype=False,
@@ -7366,7 +7366,7 @@ def OpHitObjectRecordMissMotionNV(
     d: SpirvInstruction,  # 'Current Time'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5251,
+        opcode=Op.HitObjectRecordMissMotionNV,
         args=(x, y, z, a, b, c, d),
         hasresult=False,
         hasrtype=False,
@@ -7378,7 +7378,7 @@ def OpHitObjectGetWorldToObjectNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5252,
+        opcode=Op.HitObjectGetWorldToObjectNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7390,7 +7390,7 @@ def OpHitObjectGetObjectToWorldNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5253,
+        opcode=Op.HitObjectGetObjectToWorldNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7402,7 +7402,7 @@ def OpHitObjectGetObjectRayDirectionNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5254,
+        opcode=Op.HitObjectGetObjectRayDirectionNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7414,7 +7414,7 @@ def OpHitObjectGetObjectRayOriginNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5255,
+        opcode=Op.HitObjectGetObjectRayOriginNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7437,7 +7437,7 @@ def OpHitObjectTraceRayMotionNV(
     j: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5256,
+        opcode=Op.HitObjectTraceRayMotionNV,
         args=(x, y, z, a, b, c, d, e, f, g, h, i, j),
         hasresult=False,
         hasrtype=False,
@@ -7449,7 +7449,7 @@ def OpHitObjectGetShaderRecordBufferHandleNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5257,
+        opcode=Op.HitObjectGetShaderRecordBufferHandleNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7461,7 +7461,7 @@ def OpHitObjectGetShaderBindingTableRecordIndexNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5258,
+        opcode=Op.HitObjectGetShaderBindingTableRecordIndexNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7472,7 +7472,7 @@ def OpHitObjectRecordEmptyNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5259,
+        opcode=Op.HitObjectRecordEmptyNV,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -7494,7 +7494,7 @@ def OpHitObjectTraceRayNV(
     i: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5260,
+        opcode=Op.HitObjectTraceRayNV,
         args=(x, y, z, a, b, c, d, e, f, g, h, i),
         hasresult=False,
         hasrtype=False,
@@ -7517,7 +7517,7 @@ def OpHitObjectRecordHitNV(
     j: SpirvInstruction,  # 'HitObject Attributes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5261,
+        opcode=Op.HitObjectRecordHitNV,
         args=(x, y, z, a, b, c, d, e, f, g, h, i, j),
         hasresult=False,
         hasrtype=False,
@@ -7539,7 +7539,7 @@ def OpHitObjectRecordHitWithIndexNV(
     i: SpirvInstruction,  # 'HitObject Attributes'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5262,
+        opcode=Op.HitObjectRecordHitWithIndexNV,
         args=(x, y, z, a, b, c, d, e, f, g, h, i),
         hasresult=False,
         hasrtype=False,
@@ -7555,7 +7555,7 @@ def OpHitObjectRecordMissNV(
     c: SpirvInstruction,  # 'TMax'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5263,
+        opcode=Op.HitObjectRecordMissNV,
         args=(x, y, z, a, b, c),
         hasresult=False,
         hasrtype=False,
@@ -7567,7 +7567,7 @@ def OpHitObjectExecuteShaderNV(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5264,
+        opcode=Op.HitObjectExecuteShaderNV,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -7579,7 +7579,7 @@ def OpHitObjectGetCurrentTimeNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5265,
+        opcode=Op.HitObjectGetCurrentTimeNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7591,7 +7591,7 @@ def OpHitObjectGetAttributesNV(
     y: SpirvInstruction,  # 'Hit Object Attribute'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5266,
+        opcode=Op.HitObjectGetAttributesNV,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -7603,7 +7603,7 @@ def OpHitObjectGetHitKindNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5267,
+        opcode=Op.HitObjectGetHitKindNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7615,7 +7615,7 @@ def OpHitObjectGetPrimitiveIndexNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5268,
+        opcode=Op.HitObjectGetPrimitiveIndexNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7627,7 +7627,7 @@ def OpHitObjectGetGeometryIndexNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5269,
+        opcode=Op.HitObjectGetGeometryIndexNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7639,7 +7639,7 @@ def OpHitObjectGetInstanceIdNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5270,
+        opcode=Op.HitObjectGetInstanceIdNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7651,7 +7651,7 @@ def OpHitObjectGetInstanceCustomIndexNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5271,
+        opcode=Op.HitObjectGetInstanceCustomIndexNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7663,7 +7663,7 @@ def OpHitObjectGetWorldRayDirectionNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5272,
+        opcode=Op.HitObjectGetWorldRayDirectionNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7675,7 +7675,7 @@ def OpHitObjectGetWorldRayOriginNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5273,
+        opcode=Op.HitObjectGetWorldRayOriginNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7687,7 +7687,7 @@ def OpHitObjectGetRayTMaxNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5274,
+        opcode=Op.HitObjectGetRayTMaxNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7699,7 +7699,7 @@ def OpHitObjectGetRayTMinNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5275,
+        opcode=Op.HitObjectGetRayTMinNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7711,7 +7711,7 @@ def OpHitObjectIsEmptyNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5276,
+        opcode=Op.HitObjectIsEmptyNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7723,7 +7723,7 @@ def OpHitObjectIsHitNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5277,
+        opcode=Op.HitObjectIsHitNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7735,7 +7735,7 @@ def OpHitObjectIsMissNV(
     x: SpirvInstruction,  # 'Hit Object'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5278,
+        opcode=Op.HitObjectIsMissNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7748,7 +7748,7 @@ def OpReorderThreadWithHitObjectNV(
     z: Optional[SpirvInstruction] = None,  # 'Bits'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5279,
+        opcode=Op.ReorderThreadWithHitObjectNV,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -7760,7 +7760,7 @@ def OpReorderThreadWithHintNV(
     y: SpirvInstruction,  # 'Bits'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5280,
+        opcode=Op.ReorderThreadWithHintNV,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -7769,7 +7769,7 @@ def OpReorderThreadWithHintNV(
 
 def OpTypeHitObjectNV() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5281,
+        opcode=Op.TypeHitObjectNV,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -7785,7 +7785,7 @@ def OpImageSampleFootprintNV(
     b: Optional[ImageOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5283,
+        opcode=Op.ImageSampleFootprintNV,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7799,7 +7799,7 @@ def OpEmitMeshTasksEXT(
     a: Optional[SpirvInstruction] = None,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5294,
+        opcode=Op.EmitMeshTasksEXT,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,
@@ -7811,7 +7811,7 @@ def OpSetMeshOutputsEXT(
     y: SpirvInstruction,  # 'Primitive Count'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5295,
+        opcode=Op.SetMeshOutputsEXT,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -7823,7 +7823,7 @@ def OpGroupNonUniformPartitionNV(
     x: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5296,
+        opcode=Op.GroupNonUniformPartitionNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -7835,7 +7835,7 @@ def OpWritePackedPrimitiveIndices4x8NV(
     y: SpirvInstruction,  # 'Packed Indices'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5299,
+        opcode=Op.WritePackedPrimitiveIndices4x8NV,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -7851,7 +7851,7 @@ def OpFetchMicroTriangleVertexPositionNV(
     b: SpirvInstruction,  # 'Barycentric'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5300,
+        opcode=Op.FetchMicroTriangleVertexPositionNV,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7867,7 +7867,7 @@ def OpFetchMicroTriangleVertexBarycentricNV(
     b: SpirvInstruction,  # 'Barycentric'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5301,
+        opcode=Op.FetchMicroTriangleVertexBarycentricNV,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -7880,7 +7880,7 @@ def OpReportIntersectionNV(
     y: SpirvInstruction,  # 'HitKind'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5334,
+        opcode=Op.ReportIntersectionNV,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -7893,7 +7893,7 @@ def OpReportIntersectionKHR(
     y: SpirvInstruction,  # 'HitKind'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5334,
+        opcode=Op.ReportIntersectionKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -7902,7 +7902,7 @@ def OpReportIntersectionKHR(
 
 def OpIgnoreIntersectionNV() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5335,
+        opcode=Op.IgnoreIntersectionNV,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -7911,7 +7911,7 @@ def OpIgnoreIntersectionNV() -> SpirvInstruction:
 
 def OpTerminateRayNV() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5336,
+        opcode=Op.TerminateRayNV,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -7932,7 +7932,7 @@ def OpTraceNV(
     h: SpirvInstruction,  # 'PayloadId'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5337,
+        opcode=Op.TraceNV,
         args=(x, y, z, a, b, c, d, e, f, g, h),
         hasresult=False,
         hasrtype=False,
@@ -7954,7 +7954,7 @@ def OpTraceMotionNV(
     i: SpirvInstruction,  # 'PayloadId'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5338,
+        opcode=Op.TraceMotionNV,
         args=(x, y, z, a, b, c, d, e, f, g, h, i),
         hasresult=False,
         hasrtype=False,
@@ -7976,7 +7976,7 @@ def OpTraceRayMotionNV(
     i: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5339,
+        opcode=Op.TraceRayMotionNV,
         args=(x, y, z, a, b, c, d, e, f, g, h, i),
         hasresult=False,
         hasrtype=False,
@@ -7989,7 +7989,7 @@ def OpRayQueryGetIntersectionTriangleVertexPositionsKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5340,
+        opcode=Op.RayQueryGetIntersectionTriangleVertexPositionsKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -7998,7 +7998,7 @@ def OpRayQueryGetIntersectionTriangleVertexPositionsKHR(
 
 def OpTypeAccelerationStructureNV() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5341,
+        opcode=Op.TypeAccelerationStructureNV,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8007,7 +8007,7 @@ def OpTypeAccelerationStructureNV() -> SpirvInstruction:
 
 def OpTypeAccelerationStructureKHR() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5341,
+        opcode=Op.TypeAccelerationStructureKHR,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8019,7 +8019,7 @@ def OpExecuteCallableNV(
     y: SpirvInstruction,  # 'Callable DataId'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5344,
+        opcode=Op.ExecuteCallableNV,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -8033,7 +8033,7 @@ def OpTypeCooperativeMatrixNV(
     a: SpirvInstruction,  # 'Columns'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5358,
+        opcode=Op.TypeCooperativeMatrixNV,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=False,
@@ -8048,7 +8048,7 @@ def OpCooperativeMatrixLoadNV(
     a: Optional[MemoryAccess] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5359,
+        opcode=Op.CooperativeMatrixLoadNV,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -8063,7 +8063,7 @@ def OpCooperativeMatrixStoreNV(
     b: Optional[MemoryAccess] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5360,
+        opcode=Op.CooperativeMatrixStoreNV,
         args=(x, y, z, a, b),
         hasresult=False,
         hasrtype=False,
@@ -8077,7 +8077,7 @@ def OpCooperativeMatrixMulAddNV(
     z: SpirvInstruction,  # 'C'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5361,
+        opcode=Op.CooperativeMatrixMulAddNV,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -8089,7 +8089,7 @@ def OpCooperativeMatrixLengthNV(
     x: SpirvInstruction,  # 'Type'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5362,
+        opcode=Op.CooperativeMatrixLengthNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8098,7 +8098,7 @@ def OpCooperativeMatrixLengthNV(
 
 def OpBeginInvocationInterlockEXT() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5364,
+        opcode=Op.BeginInvocationInterlockEXT,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -8107,7 +8107,7 @@ def OpBeginInvocationInterlockEXT() -> SpirvInstruction:
 
 def OpEndInvocationInterlockEXT() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5365,
+        opcode=Op.EndInvocationInterlockEXT,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -8116,7 +8116,7 @@ def OpEndInvocationInterlockEXT() -> SpirvInstruction:
 
 def OpDemoteToHelperInvocation() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5380,
+        opcode=Op.DemoteToHelperInvocation,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -8125,7 +8125,7 @@ def OpDemoteToHelperInvocation() -> SpirvInstruction:
 
 def OpDemoteToHelperInvocationEXT() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5380,
+        opcode=Op.DemoteToHelperInvocationEXT,
         args=(),
         hasresult=False,
         hasrtype=False,
@@ -8136,7 +8136,7 @@ def OpIsHelperInvocationEXT(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5381,
+        opcode=Op.IsHelperInvocationEXT,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -8148,7 +8148,7 @@ def OpConvertUToImageNV(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5391,
+        opcode=Op.ConvertUToImageNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8160,7 +8160,7 @@ def OpConvertUToSamplerNV(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5392,
+        opcode=Op.ConvertUToSamplerNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8172,7 +8172,7 @@ def OpConvertImageToUNV(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5393,
+        opcode=Op.ConvertImageToUNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8184,7 +8184,7 @@ def OpConvertSamplerToUNV(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5394,
+        opcode=Op.ConvertSamplerToUNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8196,7 +8196,7 @@ def OpConvertUToSampledImageNV(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5395,
+        opcode=Op.ConvertUToSampledImageNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8208,7 +8208,7 @@ def OpConvertSampledImageToUNV(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5396,
+        opcode=Op.ConvertSampledImageToUNV,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8219,7 +8219,7 @@ def OpSamplerImageAddressingModeNV(
     x: int,  # 'Bit Width'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5397,
+        opcode=Op.SamplerImageAddressingModeNV,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -8235,7 +8235,7 @@ def OpRawAccessChainNV(
     b: Optional[RawAccessChainOperands] = None,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5398,
+        opcode=Op.RawAccessChainNV,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -8248,7 +8248,7 @@ def OpSubgroupShuffleINTEL(
     y: SpirvInstruction,  # 'InvocationId'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5571,
+        opcode=Op.SubgroupShuffleINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8262,7 +8262,7 @@ def OpSubgroupShuffleDownINTEL(
     z: SpirvInstruction,  # 'Delta'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5572,
+        opcode=Op.SubgroupShuffleDownINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -8276,7 +8276,7 @@ def OpSubgroupShuffleUpINTEL(
     z: SpirvInstruction,  # 'Delta'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5573,
+        opcode=Op.SubgroupShuffleUpINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -8289,7 +8289,7 @@ def OpSubgroupShuffleXorINTEL(
     y: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5574,
+        opcode=Op.SubgroupShuffleXorINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8301,7 +8301,7 @@ def OpSubgroupBlockReadINTEL(
     x: SpirvInstruction,  # 'Ptr'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5575,
+        opcode=Op.SubgroupBlockReadINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8313,7 +8313,7 @@ def OpSubgroupBlockWriteINTEL(
     y: SpirvInstruction,  # 'Data'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5576,
+        opcode=Op.SubgroupBlockWriteINTEL,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -8326,7 +8326,7 @@ def OpSubgroupImageBlockReadINTEL(
     y: SpirvInstruction,  # 'Coordinate'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5577,
+        opcode=Op.SubgroupImageBlockReadINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8339,7 +8339,7 @@ def OpSubgroupImageBlockWriteINTEL(
     z: SpirvInstruction,  # 'Data'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5578,
+        opcode=Op.SubgroupImageBlockWriteINTEL,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -8354,7 +8354,7 @@ def OpSubgroupImageMediaBlockReadINTEL(
     a: SpirvInstruction,  # 'Height'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5580,
+        opcode=Op.SubgroupImageMediaBlockReadINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -8369,7 +8369,7 @@ def OpSubgroupImageMediaBlockWriteINTEL(
     b: SpirvInstruction,  # 'Data'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5581,
+        opcode=Op.SubgroupImageMediaBlockWriteINTEL,
         args=(x, y, z, a, b),
         hasresult=False,
         hasrtype=False,
@@ -8381,7 +8381,7 @@ def OpUCountLeadingZerosINTEL(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5585,
+        opcode=Op.UCountLeadingZerosINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8393,7 +8393,7 @@ def OpUCountTrailingZerosINTEL(
     x: SpirvInstruction,  # 'Operand'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5586,
+        opcode=Op.UCountTrailingZerosINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8406,7 +8406,7 @@ def OpAbsISubINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5587,
+        opcode=Op.AbsISubINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8419,7 +8419,7 @@ def OpAbsUSubINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5588,
+        opcode=Op.AbsUSubINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8432,7 +8432,7 @@ def OpIAddSatINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5589,
+        opcode=Op.IAddSatINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8445,7 +8445,7 @@ def OpUAddSatINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5590,
+        opcode=Op.UAddSatINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8458,7 +8458,7 @@ def OpIAverageINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5591,
+        opcode=Op.IAverageINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8471,7 +8471,7 @@ def OpUAverageINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5592,
+        opcode=Op.UAverageINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8484,7 +8484,7 @@ def OpIAverageRoundedINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5593,
+        opcode=Op.IAverageRoundedINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8497,7 +8497,7 @@ def OpUAverageRoundedINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5594,
+        opcode=Op.UAverageRoundedINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8510,7 +8510,7 @@ def OpISubSatINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5595,
+        opcode=Op.ISubSatINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8523,7 +8523,7 @@ def OpUSubSatINTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5596,
+        opcode=Op.USubSatINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8536,7 +8536,7 @@ def OpIMul32x16INTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5597,
+        opcode=Op.IMul32x16INTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8549,7 +8549,7 @@ def OpUMul32x16INTEL(
     y: SpirvInstruction,  # 'Operand 2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5598,
+        opcode=Op.UMul32x16INTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8561,7 +8561,7 @@ def OpConstantFunctionPointerINTEL(
     x: SpirvInstruction,  # 'Function'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5600,
+        opcode=Op.ConstantFunctionPointerINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8573,7 +8573,7 @@ def OpFunctionPointerCallINTEL(
     *x: SpirvInstruction,  # 'Operand 1'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5601,
+        opcode=Op.FunctionPointerCallINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8585,7 +8585,7 @@ def OpAsmTargetINTEL(
     x: str,  # 'Asm target'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5609,
+        opcode=Op.AsmTargetINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -8600,7 +8600,7 @@ def OpAsmINTEL(
     a: str,  # 'Constraints'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5610,
+        opcode=Op.AsmINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -8613,7 +8613,7 @@ def OpAsmCallINTEL(
     *y: SpirvInstruction,  # 'Argument 0'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5611,
+        opcode=Op.AsmCallINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8628,7 +8628,7 @@ def OpAtomicFMinEXT(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5614,
+        opcode=Op.AtomicFMinEXT,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -8643,7 +8643,7 @@ def OpAtomicFMaxEXT(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5615,
+        opcode=Op.AtomicFMaxEXT,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -8654,7 +8654,7 @@ def OpAssumeTrueKHR(
     x: SpirvInstruction,  # 'Condition'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5630,
+        opcode=Op.AssumeTrueKHR,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -8667,7 +8667,7 @@ def OpExpectKHR(
     y: SpirvInstruction,  # 'ExpectedValue'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5631,
+        opcode=Op.ExpectKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8679,7 +8679,7 @@ def OpDecorateString(
     y: Decoration,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5632,
+        opcode=Op.DecorateString,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -8691,7 +8691,7 @@ def OpDecorateStringGOOGLE(
     y: Decoration,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5632,
+        opcode=Op.DecorateStringGOOGLE,
         args=(x, y),
         hasresult=False,
         hasrtype=False,
@@ -8704,7 +8704,7 @@ def OpMemberDecorateString(
     z: Decoration,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5633,
+        opcode=Op.MemberDecorateString,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -8717,7 +8717,7 @@ def OpMemberDecorateStringGOOGLE(
     z: Decoration,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5633,
+        opcode=Op.MemberDecorateStringGOOGLE,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -8730,7 +8730,7 @@ def OpVmeImageINTEL(
     y: SpirvInstruction,  # 'Sampler'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5699,
+        opcode=Op.VmeImageINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8741,7 +8741,7 @@ def OpTypeVmeImageINTEL(
     x: SpirvInstruction,  # 'Image Type'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5700,
+        opcode=Op.TypeVmeImageINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -8750,7 +8750,7 @@ def OpTypeVmeImageINTEL(
 
 def OpTypeAvcImePayloadINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5701,
+        opcode=Op.TypeAvcImePayloadINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8759,7 +8759,7 @@ def OpTypeAvcImePayloadINTEL() -> SpirvInstruction:
 
 def OpTypeAvcRefPayloadINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5702,
+        opcode=Op.TypeAvcRefPayloadINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8768,7 +8768,7 @@ def OpTypeAvcRefPayloadINTEL() -> SpirvInstruction:
 
 def OpTypeAvcSicPayloadINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5703,
+        opcode=Op.TypeAvcSicPayloadINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8777,7 +8777,7 @@ def OpTypeAvcSicPayloadINTEL() -> SpirvInstruction:
 
 def OpTypeAvcMcePayloadINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5704,
+        opcode=Op.TypeAvcMcePayloadINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8786,7 +8786,7 @@ def OpTypeAvcMcePayloadINTEL() -> SpirvInstruction:
 
 def OpTypeAvcMceResultINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5705,
+        opcode=Op.TypeAvcMceResultINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8795,7 +8795,7 @@ def OpTypeAvcMceResultINTEL() -> SpirvInstruction:
 
 def OpTypeAvcImeResultINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5706,
+        opcode=Op.TypeAvcImeResultINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8804,7 +8804,7 @@ def OpTypeAvcImeResultINTEL() -> SpirvInstruction:
 
 def OpTypeAvcImeResultSingleReferenceStreamoutINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5707,
+        opcode=Op.TypeAvcImeResultSingleReferenceStreamoutINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8813,7 +8813,7 @@ def OpTypeAvcImeResultSingleReferenceStreamoutINTEL() -> SpirvInstruction:
 
 def OpTypeAvcImeResultDualReferenceStreamoutINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5708,
+        opcode=Op.TypeAvcImeResultDualReferenceStreamoutINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8822,7 +8822,7 @@ def OpTypeAvcImeResultDualReferenceStreamoutINTEL() -> SpirvInstruction:
 
 def OpTypeAvcImeSingleReferenceStreaminINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5709,
+        opcode=Op.TypeAvcImeSingleReferenceStreaminINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8831,7 +8831,7 @@ def OpTypeAvcImeSingleReferenceStreaminINTEL() -> SpirvInstruction:
 
 def OpTypeAvcImeDualReferenceStreaminINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5710,
+        opcode=Op.TypeAvcImeDualReferenceStreaminINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8840,7 +8840,7 @@ def OpTypeAvcImeDualReferenceStreaminINTEL() -> SpirvInstruction:
 
 def OpTypeAvcRefResultINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5711,
+        opcode=Op.TypeAvcRefResultINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8849,7 +8849,7 @@ def OpTypeAvcRefResultINTEL() -> SpirvInstruction:
 
 def OpTypeAvcSicResultINTEL() -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5712,
+        opcode=Op.TypeAvcSicResultINTEL,
         args=(),
         hasresult=True,
         hasrtype=False,
@@ -8862,7 +8862,7 @@ def OpSubgroupAvcMceGetDefaultInterBaseMultiReferencePenaltyINTEL(
     y: SpirvInstruction,  # 'Qp'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5713,
+        opcode=Op.SubgroupAvcMceGetDefaultInterBaseMultiReferencePenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8875,7 +8875,7 @@ def OpSubgroupAvcMceSetInterBaseMultiReferencePenaltyINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5714,
+        opcode=Op.SubgroupAvcMceSetInterBaseMultiReferencePenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8888,7 +8888,7 @@ def OpSubgroupAvcMceGetDefaultInterShapePenaltyINTEL(
     y: SpirvInstruction,  # 'Qp'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5715,
+        opcode=Op.SubgroupAvcMceGetDefaultInterShapePenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8901,7 +8901,7 @@ def OpSubgroupAvcMceSetInterShapePenaltyINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5716,
+        opcode=Op.SubgroupAvcMceSetInterShapePenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8914,7 +8914,7 @@ def OpSubgroupAvcMceGetDefaultInterDirectionPenaltyINTEL(
     y: SpirvInstruction,  # 'Qp'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5717,
+        opcode=Op.SubgroupAvcMceGetDefaultInterDirectionPenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8927,7 +8927,7 @@ def OpSubgroupAvcMceSetInterDirectionPenaltyINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5718,
+        opcode=Op.SubgroupAvcMceSetInterDirectionPenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8940,7 +8940,7 @@ def OpSubgroupAvcMceGetDefaultIntraLumaShapePenaltyINTEL(
     y: SpirvInstruction,  # 'Qp'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5719,
+        opcode=Op.SubgroupAvcMceGetDefaultIntraLumaShapePenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8953,7 +8953,7 @@ def OpSubgroupAvcMceGetDefaultInterMotionVectorCostTableINTEL(
     y: SpirvInstruction,  # 'Qp'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5720,
+        opcode=Op.SubgroupAvcMceGetDefaultInterMotionVectorCostTableINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -8964,7 +8964,7 @@ def OpSubgroupAvcMceGetDefaultHighPenaltyCostTableINTEL(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5721,
+        opcode=Op.SubgroupAvcMceGetDefaultHighPenaltyCostTableINTEL,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -8975,7 +8975,7 @@ def OpSubgroupAvcMceGetDefaultMediumPenaltyCostTableINTEL(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5722,
+        opcode=Op.SubgroupAvcMceGetDefaultMediumPenaltyCostTableINTEL,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -8986,7 +8986,7 @@ def OpSubgroupAvcMceGetDefaultLowPenaltyCostTableINTEL(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5723,
+        opcode=Op.SubgroupAvcMceGetDefaultLowPenaltyCostTableINTEL,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -9001,7 +9001,7 @@ def OpSubgroupAvcMceSetMotionVectorCostFunctionINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5724,
+        opcode=Op.SubgroupAvcMceSetMotionVectorCostFunctionINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9014,7 +9014,7 @@ def OpSubgroupAvcMceGetDefaultIntraLumaModePenaltyINTEL(
     y: SpirvInstruction,  # 'Qp'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5725,
+        opcode=Op.SubgroupAvcMceGetDefaultIntraLumaModePenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9025,7 +9025,7 @@ def OpSubgroupAvcMceGetDefaultNonDcLumaIntraPenaltyINTEL(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5726,
+        opcode=Op.SubgroupAvcMceGetDefaultNonDcLumaIntraPenaltyINTEL,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -9036,7 +9036,7 @@ def OpSubgroupAvcMceGetDefaultIntraChromaModeBasePenaltyINTEL(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5727,
+        opcode=Op.SubgroupAvcMceGetDefaultIntraChromaModeBasePenaltyINTEL,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -9048,7 +9048,7 @@ def OpSubgroupAvcMceSetAcOnlyHaarINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5728,
+        opcode=Op.SubgroupAvcMceSetAcOnlyHaarINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9061,7 +9061,7 @@ def OpSubgroupAvcMceSetSourceInterlacedFieldPolarityINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5729,
+        opcode=Op.SubgroupAvcMceSetSourceInterlacedFieldPolarityINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9074,7 +9074,7 @@ def OpSubgroupAvcMceSetSingleReferenceInterlacedFieldPolarityINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5730,
+        opcode=Op.SubgroupAvcMceSetSingleReferenceInterlacedFieldPolarityINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9088,7 +9088,7 @@ def OpSubgroupAvcMceSetDualReferenceInterlacedFieldPolaritiesINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5731,
+        opcode=Op.SubgroupAvcMceSetDualReferenceInterlacedFieldPolaritiesINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9100,7 +9100,7 @@ def OpSubgroupAvcMceConvertToImePayloadINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5732,
+        opcode=Op.SubgroupAvcMceConvertToImePayloadINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9112,7 +9112,7 @@ def OpSubgroupAvcMceConvertToImeResultINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5733,
+        opcode=Op.SubgroupAvcMceConvertToImeResultINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9124,7 +9124,7 @@ def OpSubgroupAvcMceConvertToRefPayloadINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5734,
+        opcode=Op.SubgroupAvcMceConvertToRefPayloadINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9136,7 +9136,7 @@ def OpSubgroupAvcMceConvertToRefResultINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5735,
+        opcode=Op.SubgroupAvcMceConvertToRefResultINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9148,7 +9148,7 @@ def OpSubgroupAvcMceConvertToSicPayloadINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5736,
+        opcode=Op.SubgroupAvcMceConvertToSicPayloadINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9160,7 +9160,7 @@ def OpSubgroupAvcMceConvertToSicResultINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5737,
+        opcode=Op.SubgroupAvcMceConvertToSicResultINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9172,7 +9172,7 @@ def OpSubgroupAvcMceGetMotionVectorsINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5738,
+        opcode=Op.SubgroupAvcMceGetMotionVectorsINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9184,7 +9184,7 @@ def OpSubgroupAvcMceGetInterDistortionsINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5739,
+        opcode=Op.SubgroupAvcMceGetInterDistortionsINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9196,7 +9196,7 @@ def OpSubgroupAvcMceGetBestInterDistortionsINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5740,
+        opcode=Op.SubgroupAvcMceGetBestInterDistortionsINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9208,7 +9208,7 @@ def OpSubgroupAvcMceGetInterMajorShapeINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5741,
+        opcode=Op.SubgroupAvcMceGetInterMajorShapeINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9220,7 +9220,7 @@ def OpSubgroupAvcMceGetInterMinorShapeINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5742,
+        opcode=Op.SubgroupAvcMceGetInterMinorShapeINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9232,7 +9232,7 @@ def OpSubgroupAvcMceGetInterDirectionsINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5743,
+        opcode=Op.SubgroupAvcMceGetInterDirectionsINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9244,7 +9244,7 @@ def OpSubgroupAvcMceGetInterMotionVectorCountINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5744,
+        opcode=Op.SubgroupAvcMceGetInterMotionVectorCountINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9256,7 +9256,7 @@ def OpSubgroupAvcMceGetInterReferenceIdsINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5745,
+        opcode=Op.SubgroupAvcMceGetInterReferenceIdsINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9270,7 +9270,7 @@ def OpSubgroupAvcMceGetInterReferenceInterlacedFieldPolaritiesINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5746,
+        opcode=Op.SubgroupAvcMceGetInterReferenceInterlacedFieldPolaritiesINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9284,7 +9284,7 @@ def OpSubgroupAvcImeInitializeINTEL(
     z: SpirvInstruction,  # 'SAD Adjustment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5747,
+        opcode=Op.SubgroupAvcImeInitializeINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9298,7 +9298,7 @@ def OpSubgroupAvcImeSetSingleReferenceINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5748,
+        opcode=Op.SubgroupAvcImeSetSingleReferenceINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9313,7 +9313,7 @@ def OpSubgroupAvcImeSetDualReferenceINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5749,
+        opcode=Op.SubgroupAvcImeSetDualReferenceINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9326,7 +9326,7 @@ def OpSubgroupAvcImeRefWindowSizeINTEL(
     y: SpirvInstruction,  # 'Dual Ref'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5750,
+        opcode=Op.SubgroupAvcImeRefWindowSizeINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9341,7 +9341,7 @@ def OpSubgroupAvcImeAdjustRefOffsetINTEL(
     a: SpirvInstruction,  # 'Image Size'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5751,
+        opcode=Op.SubgroupAvcImeAdjustRefOffsetINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9353,7 +9353,7 @@ def OpSubgroupAvcImeConvertToMcePayloadINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5752,
+        opcode=Op.SubgroupAvcImeConvertToMcePayloadINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9366,7 +9366,7 @@ def OpSubgroupAvcImeSetMaxMotionVectorCountINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5753,
+        opcode=Op.SubgroupAvcImeSetMaxMotionVectorCountINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9378,7 +9378,7 @@ def OpSubgroupAvcImeSetUnidirectionalMixDisableINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5754,
+        opcode=Op.SubgroupAvcImeSetUnidirectionalMixDisableINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9391,7 +9391,7 @@ def OpSubgroupAvcImeSetEarlySearchTerminationThresholdINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5755,
+        opcode=Op.SubgroupAvcImeSetEarlySearchTerminationThresholdINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9404,7 +9404,7 @@ def OpSubgroupAvcImeSetWeightedSadINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5756,
+        opcode=Op.SubgroupAvcImeSetWeightedSadINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9418,7 +9418,7 @@ def OpSubgroupAvcImeEvaluateWithSingleReferenceINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5757,
+        opcode=Op.SubgroupAvcImeEvaluateWithSingleReferenceINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9433,7 +9433,7 @@ def OpSubgroupAvcImeEvaluateWithDualReferenceINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5758,
+        opcode=Op.SubgroupAvcImeEvaluateWithDualReferenceINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9448,7 +9448,7 @@ def OpSubgroupAvcImeEvaluateWithSingleReferenceStreaminINTEL(
     a: SpirvInstruction,  # 'Streamin Components'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5759,
+        opcode=Op.SubgroupAvcImeEvaluateWithSingleReferenceStreaminINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9464,7 +9464,7 @@ def OpSubgroupAvcImeEvaluateWithDualReferenceStreaminINTEL(
     b: SpirvInstruction,  # 'Streamin Components'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5760,
+        opcode=Op.SubgroupAvcImeEvaluateWithDualReferenceStreaminINTEL,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -9478,7 +9478,7 @@ def OpSubgroupAvcImeEvaluateWithSingleReferenceStreamoutINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5761,
+        opcode=Op.SubgroupAvcImeEvaluateWithSingleReferenceStreamoutINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9493,7 +9493,7 @@ def OpSubgroupAvcImeEvaluateWithDualReferenceStreamoutINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5762,
+        opcode=Op.SubgroupAvcImeEvaluateWithDualReferenceStreamoutINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9508,7 +9508,7 @@ def OpSubgroupAvcImeEvaluateWithSingleReferenceStreaminoutINTEL(
     a: SpirvInstruction,  # 'Streamin Components'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5763,
+        opcode=Op.SubgroupAvcImeEvaluateWithSingleReferenceStreaminoutINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9524,7 +9524,7 @@ def OpSubgroupAvcImeEvaluateWithDualReferenceStreaminoutINTEL(
     b: SpirvInstruction,  # 'Streamin Components'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5764,
+        opcode=Op.SubgroupAvcImeEvaluateWithDualReferenceStreaminoutINTEL,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -9536,7 +9536,7 @@ def OpSubgroupAvcImeConvertToMceResultINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5765,
+        opcode=Op.SubgroupAvcImeConvertToMceResultINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9548,7 +9548,7 @@ def OpSubgroupAvcImeGetSingleReferenceStreaminINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5766,
+        opcode=Op.SubgroupAvcImeGetSingleReferenceStreaminINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9560,7 +9560,7 @@ def OpSubgroupAvcImeGetDualReferenceStreaminINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5767,
+        opcode=Op.SubgroupAvcImeGetDualReferenceStreaminINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9572,7 +9572,7 @@ def OpSubgroupAvcImeStripSingleReferenceStreamoutINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5768,
+        opcode=Op.SubgroupAvcImeStripSingleReferenceStreamoutINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9584,7 +9584,7 @@ def OpSubgroupAvcImeStripDualReferenceStreamoutINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5769,
+        opcode=Op.SubgroupAvcImeStripDualReferenceStreamoutINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9597,7 +9597,7 @@ def OpSubgroupAvcImeGetStreamoutSingleReferenceMajorShapeMotionVectorsINTEL(
     y: SpirvInstruction,  # 'Major Shape'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5770,
+        opcode=Op.SubgroupAvcImeGetStreamoutSingleReferenceMajorShapeMotionVectorsINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9610,7 +9610,7 @@ def OpSubgroupAvcImeGetStreamoutSingleReferenceMajorShapeDistortionsINTEL(
     y: SpirvInstruction,  # 'Major Shape'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5771,
+        opcode=Op.SubgroupAvcImeGetStreamoutSingleReferenceMajorShapeDistortionsINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9623,7 +9623,7 @@ def OpSubgroupAvcImeGetStreamoutSingleReferenceMajorShapeReferenceIdsINTEL(
     y: SpirvInstruction,  # 'Major Shape'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5772,
+        opcode=Op.SubgroupAvcImeGetStreamoutSingleReferenceMajorShapeReferenceIdsINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9637,7 +9637,7 @@ def OpSubgroupAvcImeGetStreamoutDualReferenceMajorShapeMotionVectorsINTEL(
     z: SpirvInstruction,  # 'Direction'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5773,
+        opcode=Op.SubgroupAvcImeGetStreamoutDualReferenceMajorShapeMotionVectorsINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9651,7 +9651,7 @@ def OpSubgroupAvcImeGetStreamoutDualReferenceMajorShapeDistortionsINTEL(
     z: SpirvInstruction,  # 'Direction'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5774,
+        opcode=Op.SubgroupAvcImeGetStreamoutDualReferenceMajorShapeDistortionsINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9665,7 +9665,7 @@ def OpSubgroupAvcImeGetStreamoutDualReferenceMajorShapeReferenceIdsINTEL(
     z: SpirvInstruction,  # 'Direction'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5775,
+        opcode=Op.SubgroupAvcImeGetStreamoutDualReferenceMajorShapeReferenceIdsINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9678,7 +9678,7 @@ def OpSubgroupAvcImeGetBorderReachedINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5776,
+        opcode=Op.SubgroupAvcImeGetBorderReachedINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9690,7 +9690,7 @@ def OpSubgroupAvcImeGetTruncatedSearchIndicationINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5777,
+        opcode=Op.SubgroupAvcImeGetTruncatedSearchIndicationINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9702,7 +9702,7 @@ def OpSubgroupAvcImeGetUnidirectionalEarlySearchTerminationINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5778,
+        opcode=Op.SubgroupAvcImeGetUnidirectionalEarlySearchTerminationINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9714,7 +9714,7 @@ def OpSubgroupAvcImeGetWeightingPatternMinimumMotionVectorINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5779,
+        opcode=Op.SubgroupAvcImeGetWeightingPatternMinimumMotionVectorINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9726,7 +9726,7 @@ def OpSubgroupAvcImeGetWeightingPatternMinimumDistortionINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5780,
+        opcode=Op.SubgroupAvcImeGetWeightingPatternMinimumDistortionINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9744,7 +9744,7 @@ def OpSubgroupAvcFmeInitializeINTEL(
     d: SpirvInstruction,  # 'Sad Adjustment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5781,
+        opcode=Op.SubgroupAvcFmeInitializeINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -9763,7 +9763,7 @@ def OpSubgroupAvcBmeInitializeINTEL(
     e: SpirvInstruction,  # 'Sad Adjustment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5782,
+        opcode=Op.SubgroupAvcBmeInitializeINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -9775,7 +9775,7 @@ def OpSubgroupAvcRefConvertToMcePayloadINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5783,
+        opcode=Op.SubgroupAvcRefConvertToMcePayloadINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9787,7 +9787,7 @@ def OpSubgroupAvcRefSetBidirectionalMixDisableINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5784,
+        opcode=Op.SubgroupAvcRefSetBidirectionalMixDisableINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9799,7 +9799,7 @@ def OpSubgroupAvcRefSetBilinearFilterEnableINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5785,
+        opcode=Op.SubgroupAvcRefSetBilinearFilterEnableINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9813,7 +9813,7 @@ def OpSubgroupAvcRefEvaluateWithSingleReferenceINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5786,
+        opcode=Op.SubgroupAvcRefEvaluateWithSingleReferenceINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9828,7 +9828,7 @@ def OpSubgroupAvcRefEvaluateWithDualReferenceINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5787,
+        opcode=Op.SubgroupAvcRefEvaluateWithDualReferenceINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9842,7 +9842,7 @@ def OpSubgroupAvcRefEvaluateWithMultiReferenceINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5788,
+        opcode=Op.SubgroupAvcRefEvaluateWithMultiReferenceINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -9857,7 +9857,7 @@ def OpSubgroupAvcRefEvaluateWithMultiReferenceInterlacedINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5789,
+        opcode=Op.SubgroupAvcRefEvaluateWithMultiReferenceInterlacedINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -9869,7 +9869,7 @@ def OpSubgroupAvcRefConvertToMceResultINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5790,
+        opcode=Op.SubgroupAvcRefConvertToMceResultINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9881,7 +9881,7 @@ def OpSubgroupAvcSicInitializeINTEL(
     x: SpirvInstruction,  # 'Src Coord'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5791,
+        opcode=Op.SubgroupAvcSicInitializeINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9898,7 +9898,7 @@ def OpSubgroupAvcSicConfigureSkcINTEL(
     c: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5792,
+        opcode=Op.SubgroupAvcSicConfigureSkcINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -9917,7 +9917,7 @@ def OpSubgroupAvcSicConfigureIpeLumaINTEL(
     e: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5793,
+        opcode=Op.SubgroupAvcSicConfigureIpeLumaINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -9939,7 +9939,7 @@ def OpSubgroupAvcSicConfigureIpeLumaChromaINTEL(
     h: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5794,
+        opcode=Op.SubgroupAvcSicConfigureIpeLumaChromaINTEL,
         args=(x, y, z, a, b, c, d, e, f, g, h),
         hasresult=True,
         hasrtype=True,
@@ -9952,7 +9952,7 @@ def OpSubgroupAvcSicGetMotionVectorMaskINTEL(
     y: SpirvInstruction,  # 'Direction'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5795,
+        opcode=Op.SubgroupAvcSicGetMotionVectorMaskINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9964,7 +9964,7 @@ def OpSubgroupAvcSicConvertToMcePayloadINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5796,
+        opcode=Op.SubgroupAvcSicConvertToMcePayloadINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -9977,7 +9977,7 @@ def OpSubgroupAvcSicSetIntraLumaShapePenaltyINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5797,
+        opcode=Op.SubgroupAvcSicSetIntraLumaShapePenaltyINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -9992,7 +9992,7 @@ def OpSubgroupAvcSicSetIntraLumaModeCostFunctionINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5798,
+        opcode=Op.SubgroupAvcSicSetIntraLumaModeCostFunctionINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -10005,7 +10005,7 @@ def OpSubgroupAvcSicSetIntraChromaModeCostFunctionINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5799,
+        opcode=Op.SubgroupAvcSicSetIntraChromaModeCostFunctionINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -10017,7 +10017,7 @@ def OpSubgroupAvcSicSetBilinearFilterEnableINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5800,
+        opcode=Op.SubgroupAvcSicSetBilinearFilterEnableINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10030,7 +10030,7 @@ def OpSubgroupAvcSicSetSkcForwardTransformEnableINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5801,
+        opcode=Op.SubgroupAvcSicSetSkcForwardTransformEnableINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -10043,7 +10043,7 @@ def OpSubgroupAvcSicSetBlockBasedRawSkipSadINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5802,
+        opcode=Op.SubgroupAvcSicSetBlockBasedRawSkipSadINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -10056,7 +10056,7 @@ def OpSubgroupAvcSicEvaluateIpeINTEL(
     y: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5803,
+        opcode=Op.SubgroupAvcSicEvaluateIpeINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -10070,7 +10070,7 @@ def OpSubgroupAvcSicEvaluateWithSingleReferenceINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5804,
+        opcode=Op.SubgroupAvcSicEvaluateWithSingleReferenceINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -10085,7 +10085,7 @@ def OpSubgroupAvcSicEvaluateWithDualReferenceINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5805,
+        opcode=Op.SubgroupAvcSicEvaluateWithDualReferenceINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -10099,7 +10099,7 @@ def OpSubgroupAvcSicEvaluateWithMultiReferenceINTEL(
     z: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5806,
+        opcode=Op.SubgroupAvcSicEvaluateWithMultiReferenceINTEL,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -10114,7 +10114,7 @@ def OpSubgroupAvcSicEvaluateWithMultiReferenceInterlacedINTEL(
     a: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5807,
+        opcode=Op.SubgroupAvcSicEvaluateWithMultiReferenceInterlacedINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -10126,7 +10126,7 @@ def OpSubgroupAvcSicConvertToMceResultINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5808,
+        opcode=Op.SubgroupAvcSicConvertToMceResultINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10138,7 +10138,7 @@ def OpSubgroupAvcSicGetIpeLumaShapeINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5809,
+        opcode=Op.SubgroupAvcSicGetIpeLumaShapeINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10150,7 +10150,7 @@ def OpSubgroupAvcSicGetBestIpeLumaDistortionINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5810,
+        opcode=Op.SubgroupAvcSicGetBestIpeLumaDistortionINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10162,7 +10162,7 @@ def OpSubgroupAvcSicGetBestIpeChromaDistortionINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5811,
+        opcode=Op.SubgroupAvcSicGetBestIpeChromaDistortionINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10174,7 +10174,7 @@ def OpSubgroupAvcSicGetPackedIpeLumaModesINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5812,
+        opcode=Op.SubgroupAvcSicGetPackedIpeLumaModesINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10186,7 +10186,7 @@ def OpSubgroupAvcSicGetIpeChromaModeINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5813,
+        opcode=Op.SubgroupAvcSicGetIpeChromaModeINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10198,7 +10198,7 @@ def OpSubgroupAvcSicGetPackedSkcLumaCountThresholdINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5814,
+        opcode=Op.SubgroupAvcSicGetPackedSkcLumaCountThresholdINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10210,7 +10210,7 @@ def OpSubgroupAvcSicGetPackedSkcLumaSumThresholdINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5815,
+        opcode=Op.SubgroupAvcSicGetPackedSkcLumaSumThresholdINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10222,7 +10222,7 @@ def OpSubgroupAvcSicGetInterRawSadsINTEL(
     x: SpirvInstruction,  # 'Payload'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5816,
+        opcode=Op.SubgroupAvcSicGetInterRawSadsINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10234,7 +10234,7 @@ def OpVariableLengthArrayINTEL(
     x: SpirvInstruction,  # 'Lenght'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5818,
+        opcode=Op.VariableLengthArrayINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -10245,7 +10245,7 @@ def OpSaveMemoryINTEL(
     rtype: SpirvInstruction,
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5819,
+        opcode=Op.SaveMemoryINTEL,
         args=(),
         hasresult=True,
         hasrtype=True,
@@ -10256,7 +10256,7 @@ def OpRestoreMemoryINTEL(
     x: SpirvInstruction,  # 'Ptr'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5820,
+        opcode=Op.RestoreMemoryINTEL,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -10274,7 +10274,7 @@ def OpArbitraryFloatSinCosPiINTEL(
     d: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5840,
+        opcode=Op.ArbitraryFloatSinCosPiINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -10291,7 +10291,7 @@ def OpArbitraryFloatCastINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5841,
+        opcode=Op.ArbitraryFloatCastINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10308,7 +10308,7 @@ def OpArbitraryFloatCastFromIntINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5842,
+        opcode=Op.ArbitraryFloatCastFromIntINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10324,7 +10324,7 @@ def OpArbitraryFloatCastToIntINTEL(
     b: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5843,
+        opcode=Op.ArbitraryFloatCastToIntINTEL,
         args=(x, y, z, a, b),
         hasresult=True,
         hasrtype=True,
@@ -10343,7 +10343,7 @@ def OpArbitraryFloatAddINTEL(
     e: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5846,
+        opcode=Op.ArbitraryFloatAddINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -10362,7 +10362,7 @@ def OpArbitraryFloatSubINTEL(
     e: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5847,
+        opcode=Op.ArbitraryFloatSubINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -10381,7 +10381,7 @@ def OpArbitraryFloatMulINTEL(
     e: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5848,
+        opcode=Op.ArbitraryFloatMulINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -10400,7 +10400,7 @@ def OpArbitraryFloatDivINTEL(
     e: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5849,
+        opcode=Op.ArbitraryFloatDivINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -10415,7 +10415,7 @@ def OpArbitraryFloatGTINTEL(
     a: int,  # 'M2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5850,
+        opcode=Op.ArbitraryFloatGTINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -10430,7 +10430,7 @@ def OpArbitraryFloatGEINTEL(
     a: int,  # 'M2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5851,
+        opcode=Op.ArbitraryFloatGEINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -10445,7 +10445,7 @@ def OpArbitraryFloatLTINTEL(
     a: int,  # 'M2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5852,
+        opcode=Op.ArbitraryFloatLTINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -10460,7 +10460,7 @@ def OpArbitraryFloatLEINTEL(
     a: int,  # 'M2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5853,
+        opcode=Op.ArbitraryFloatLEINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -10475,7 +10475,7 @@ def OpArbitraryFloatEQINTEL(
     a: int,  # 'M2'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5854,
+        opcode=Op.ArbitraryFloatEQINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -10492,7 +10492,7 @@ def OpArbitraryFloatRecipINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5855,
+        opcode=Op.ArbitraryFloatRecipINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10509,7 +10509,7 @@ def OpArbitraryFloatRSqrtINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5856,
+        opcode=Op.ArbitraryFloatRSqrtINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10526,7 +10526,7 @@ def OpArbitraryFloatCbrtINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5857,
+        opcode=Op.ArbitraryFloatCbrtINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10545,7 +10545,7 @@ def OpArbitraryFloatHypotINTEL(
     e: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5858,
+        opcode=Op.ArbitraryFloatHypotINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -10562,7 +10562,7 @@ def OpArbitraryFloatSqrtINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5859,
+        opcode=Op.ArbitraryFloatSqrtINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10579,7 +10579,7 @@ def OpArbitraryFloatLogINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5860,
+        opcode=Op.ArbitraryFloatLogINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10596,7 +10596,7 @@ def OpArbitraryFloatLog2INTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5861,
+        opcode=Op.ArbitraryFloatLog2INTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10613,7 +10613,7 @@ def OpArbitraryFloatLog10INTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5862,
+        opcode=Op.ArbitraryFloatLog10INTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10630,7 +10630,7 @@ def OpArbitraryFloatLog1pINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5863,
+        opcode=Op.ArbitraryFloatLog1pINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10647,7 +10647,7 @@ def OpArbitraryFloatExpINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5864,
+        opcode=Op.ArbitraryFloatExpINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10664,7 +10664,7 @@ def OpArbitraryFloatExp2INTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5865,
+        opcode=Op.ArbitraryFloatExp2INTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10681,7 +10681,7 @@ def OpArbitraryFloatExp10INTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5866,
+        opcode=Op.ArbitraryFloatExp10INTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10698,7 +10698,7 @@ def OpArbitraryFloatExpm1INTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5867,
+        opcode=Op.ArbitraryFloatExpm1INTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10715,7 +10715,7 @@ def OpArbitraryFloatSinINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5868,
+        opcode=Op.ArbitraryFloatSinINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10732,7 +10732,7 @@ def OpArbitraryFloatCosINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5869,
+        opcode=Op.ArbitraryFloatCosINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10749,7 +10749,7 @@ def OpArbitraryFloatSinCosINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5870,
+        opcode=Op.ArbitraryFloatSinCosINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10766,7 +10766,7 @@ def OpArbitraryFloatSinPiINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5871,
+        opcode=Op.ArbitraryFloatSinPiINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10783,7 +10783,7 @@ def OpArbitraryFloatCosPiINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5872,
+        opcode=Op.ArbitraryFloatCosPiINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10800,7 +10800,7 @@ def OpArbitraryFloatASinINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5873,
+        opcode=Op.ArbitraryFloatASinINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10817,7 +10817,7 @@ def OpArbitraryFloatASinPiINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5874,
+        opcode=Op.ArbitraryFloatASinPiINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10834,7 +10834,7 @@ def OpArbitraryFloatACosINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5875,
+        opcode=Op.ArbitraryFloatACosINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10851,7 +10851,7 @@ def OpArbitraryFloatACosPiINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5876,
+        opcode=Op.ArbitraryFloatACosPiINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10868,7 +10868,7 @@ def OpArbitraryFloatATanINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5877,
+        opcode=Op.ArbitraryFloatATanINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10885,7 +10885,7 @@ def OpArbitraryFloatATanPiINTEL(
     c: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5878,
+        opcode=Op.ArbitraryFloatATanPiINTEL,
         args=(x, y, z, a, b, c),
         hasresult=True,
         hasrtype=True,
@@ -10904,7 +10904,7 @@ def OpArbitraryFloatATan2INTEL(
     e: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5879,
+        opcode=Op.ArbitraryFloatATan2INTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -10923,7 +10923,7 @@ def OpArbitraryFloatPowINTEL(
     e: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5880,
+        opcode=Op.ArbitraryFloatPowINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -10942,7 +10942,7 @@ def OpArbitraryFloatPowRINTEL(
     e: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5881,
+        opcode=Op.ArbitraryFloatPowRINTEL,
         args=(x, y, z, a, b, c, d, e),
         hasresult=True,
         hasrtype=True,
@@ -10960,7 +10960,7 @@ def OpArbitraryFloatPowNINTEL(
     d: int,  # 'RoundingAccuracy'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5882,
+        opcode=Op.ArbitraryFloatPowNINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -10971,7 +10971,7 @@ def OpLoopControlINTEL(
     *x: int,  # 'Loop Control Parameters'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5887,
+        opcode=Op.LoopControlINTEL,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -10982,7 +10982,7 @@ def OpAliasDomainDeclINTEL(
     x: Optional[SpirvInstruction] = None,  # 'Name'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5911,
+        opcode=Op.AliasDomainDeclINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -10994,7 +10994,7 @@ def OpAliasScopeDeclINTEL(
     y: Optional[SpirvInstruction] = None,  # 'Name'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5912,
+        opcode=Op.AliasScopeDeclINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=False,
@@ -11005,7 +11005,7 @@ def OpAliasScopeListDeclINTEL(
     *x: SpirvInstruction,  # 'AliasScope1, AliasScope2, ...'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5913,
+        opcode=Op.AliasScopeListDeclINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -11023,7 +11023,7 @@ def OpFixedSqrtINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5923,
+        opcode=Op.FixedSqrtINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11041,7 +11041,7 @@ def OpFixedRecipINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5924,
+        opcode=Op.FixedRecipINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11059,7 +11059,7 @@ def OpFixedRsqrtINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5925,
+        opcode=Op.FixedRsqrtINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11077,7 +11077,7 @@ def OpFixedSinINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5926,
+        opcode=Op.FixedSinINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11095,7 +11095,7 @@ def OpFixedCosINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5927,
+        opcode=Op.FixedCosINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11113,7 +11113,7 @@ def OpFixedSinCosINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5928,
+        opcode=Op.FixedSinCosINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11131,7 +11131,7 @@ def OpFixedSinPiINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5929,
+        opcode=Op.FixedSinPiINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11149,7 +11149,7 @@ def OpFixedCosPiINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5930,
+        opcode=Op.FixedCosPiINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11167,7 +11167,7 @@ def OpFixedSinCosPiINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5931,
+        opcode=Op.FixedSinCosPiINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11185,7 +11185,7 @@ def OpFixedLogINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5932,
+        opcode=Op.FixedLogINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11203,7 +11203,7 @@ def OpFixedExpINTEL(
     d: int,  # 'O'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5933,
+        opcode=Op.FixedExpINTEL,
         args=(x, y, z, a, b, c, d),
         hasresult=True,
         hasrtype=True,
@@ -11215,7 +11215,7 @@ def OpPtrCastToCrossWorkgroupINTEL(
     x: SpirvInstruction,  # 'Pointer'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5934,
+        opcode=Op.PtrCastToCrossWorkgroupINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11227,7 +11227,7 @@ def OpCrossWorkgroupCastToPtrINTEL(
     x: SpirvInstruction,  # 'Pointer'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5938,
+        opcode=Op.CrossWorkgroupCastToPtrINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11240,7 +11240,7 @@ def OpReadPipeBlockingINTEL(
     y: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5946,
+        opcode=Op.ReadPipeBlockingINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11253,7 +11253,7 @@ def OpWritePipeBlockingINTEL(
     y: SpirvInstruction,  # 'Packet Alignment'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5947,
+        opcode=Op.WritePipeBlockingINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11266,7 +11266,7 @@ def OpFPGARegINTEL(
     y: SpirvInstruction,  # 'Input'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=5949,
+        opcode=Op.FPGARegINTEL,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11278,7 +11278,7 @@ def OpRayQueryGetRayTMinKHR(
     x: SpirvInstruction,  # 'RayQuery'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6016,
+        opcode=Op.RayQueryGetRayTMinKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11290,7 +11290,7 @@ def OpRayQueryGetRayFlagsKHR(
     x: SpirvInstruction,  # 'RayQuery'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6017,
+        opcode=Op.RayQueryGetRayFlagsKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11303,7 +11303,7 @@ def OpRayQueryGetIntersectionTKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6018,
+        opcode=Op.RayQueryGetIntersectionTKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11316,7 +11316,7 @@ def OpRayQueryGetIntersectionInstanceCustomIndexKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6019,
+        opcode=Op.RayQueryGetIntersectionInstanceCustomIndexKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11329,7 +11329,7 @@ def OpRayQueryGetIntersectionInstanceIdKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6020,
+        opcode=Op.RayQueryGetIntersectionInstanceIdKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11342,7 +11342,7 @@ def OpRayQueryGetIntersectionInstanceShaderBindingTableRecordOffsetKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6021,
+        opcode=Op.RayQueryGetIntersectionInstanceShaderBindingTableRecordOffsetKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11355,7 +11355,7 @@ def OpRayQueryGetIntersectionGeometryIndexKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6022,
+        opcode=Op.RayQueryGetIntersectionGeometryIndexKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11368,7 +11368,7 @@ def OpRayQueryGetIntersectionPrimitiveIndexKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6023,
+        opcode=Op.RayQueryGetIntersectionPrimitiveIndexKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11381,7 +11381,7 @@ def OpRayQueryGetIntersectionBarycentricsKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6024,
+        opcode=Op.RayQueryGetIntersectionBarycentricsKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11394,7 +11394,7 @@ def OpRayQueryGetIntersectionFrontFaceKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6025,
+        opcode=Op.RayQueryGetIntersectionFrontFaceKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11406,7 +11406,7 @@ def OpRayQueryGetIntersectionCandidateAABBOpaqueKHR(
     x: SpirvInstruction,  # 'RayQuery'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6026,
+        opcode=Op.RayQueryGetIntersectionCandidateAABBOpaqueKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11419,7 +11419,7 @@ def OpRayQueryGetIntersectionObjectRayDirectionKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6027,
+        opcode=Op.RayQueryGetIntersectionObjectRayDirectionKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11432,7 +11432,7 @@ def OpRayQueryGetIntersectionObjectRayOriginKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6028,
+        opcode=Op.RayQueryGetIntersectionObjectRayOriginKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11444,7 +11444,7 @@ def OpRayQueryGetWorldRayDirectionKHR(
     x: SpirvInstruction,  # 'RayQuery'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6029,
+        opcode=Op.RayQueryGetWorldRayDirectionKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11456,7 +11456,7 @@ def OpRayQueryGetWorldRayOriginKHR(
     x: SpirvInstruction,  # 'RayQuery'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6030,
+        opcode=Op.RayQueryGetWorldRayOriginKHR,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11469,7 +11469,7 @@ def OpRayQueryGetIntersectionObjectToWorldKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6031,
+        opcode=Op.RayQueryGetIntersectionObjectToWorldKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11482,7 +11482,7 @@ def OpRayQueryGetIntersectionWorldToObjectKHR(
     y: SpirvInstruction,  # 'Intersection'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6032,
+        opcode=Op.RayQueryGetIntersectionWorldToObjectKHR,
         args=(x, y),
         hasresult=True,
         hasrtype=True,
@@ -11497,7 +11497,7 @@ def OpAtomicFAddEXT(
     a: SpirvInstruction,  # 'Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6035,
+        opcode=Op.AtomicFAddEXT,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -11508,7 +11508,7 @@ def OpTypeBufferSurfaceINTEL(
     x: AccessQualifier,  # 'AccessQualifier'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6086,
+        opcode=Op.TypeBufferSurfaceINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=False,
@@ -11519,7 +11519,7 @@ def OpTypeStructContinuedINTEL(
     *x: SpirvInstruction,  # 'Member 0 type', + 'member 1 type', + ...
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6090,
+        opcode=Op.TypeStructContinuedINTEL,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -11530,7 +11530,7 @@ def OpConstantCompositeContinuedINTEL(
     *x: SpirvInstruction,  # 'Constituents'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6091,
+        opcode=Op.ConstantCompositeContinuedINTEL,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -11541,7 +11541,7 @@ def OpSpecConstantCompositeContinuedINTEL(
     *x: SpirvInstruction,  # 'Constituents'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6092,
+        opcode=Op.SpecConstantCompositeContinuedINTEL,
         args=(x,),
         hasresult=False,
         hasrtype=False,
@@ -11553,7 +11553,7 @@ def OpCompositeConstructContinuedINTEL(
     *x: SpirvInstruction,  # 'Constituents'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6096,
+        opcode=Op.CompositeConstructContinuedINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11565,7 +11565,7 @@ def OpConvertFToBF16INTEL(
     x: SpirvInstruction,  # 'Float Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6116,
+        opcode=Op.ConvertFToBF16INTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11577,7 +11577,7 @@ def OpConvertBF16ToFINTEL(
     x: SpirvInstruction,  # 'BFloat16 Value'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6117,
+        opcode=Op.ConvertBF16ToFINTEL,
         args=(x,),
         hasresult=True,
         hasrtype=True,
@@ -11590,7 +11590,7 @@ def OpControlBarrierArriveINTEL(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6142,
+        opcode=Op.ControlBarrierArriveINTEL,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -11603,7 +11603,7 @@ def OpControlBarrierWaitINTEL(
     z: SpirvInstruction,  # 'Semantics'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6143,
+        opcode=Op.ControlBarrierWaitINTEL,
         args=(x, y, z),
         hasresult=False,
         hasrtype=False,
@@ -11617,7 +11617,7 @@ def OpGroupIMulKHR(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6401,
+        opcode=Op.GroupIMulKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -11631,7 +11631,7 @@ def OpGroupFMulKHR(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6402,
+        opcode=Op.GroupFMulKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -11645,7 +11645,7 @@ def OpGroupBitwiseAndKHR(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6403,
+        opcode=Op.GroupBitwiseAndKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -11659,7 +11659,7 @@ def OpGroupBitwiseOrKHR(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6404,
+        opcode=Op.GroupBitwiseOrKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -11673,7 +11673,7 @@ def OpGroupBitwiseXorKHR(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6405,
+        opcode=Op.GroupBitwiseXorKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -11687,7 +11687,7 @@ def OpGroupLogicalAndKHR(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6406,
+        opcode=Op.GroupLogicalAndKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -11701,7 +11701,7 @@ def OpGroupLogicalOrKHR(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6407,
+        opcode=Op.GroupLogicalOrKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -11715,7 +11715,7 @@ def OpGroupLogicalXorKHR(
     z: SpirvInstruction,  # 'X'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6408,
+        opcode=Op.GroupLogicalXorKHR,
         args=(x, y, z),
         hasresult=True,
         hasrtype=True,
@@ -11730,7 +11730,7 @@ def OpMaskedGatherINTEL(
     a: SpirvInstruction,  # 'FillEmpty'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6428,
+        opcode=Op.MaskedGatherINTEL,
         args=(x, y, z, a),
         hasresult=True,
         hasrtype=True,
@@ -11744,7 +11744,7 @@ def OpMaskedScatterINTEL(
     a: SpirvInstruction,  # 'Mask'
 ) -> SpirvInstruction:
     return SpirvInstruction(
-        opcode=6429,
+        opcode=Op.MaskedScatterINTEL,
         args=(x, y, z, a),
         hasresult=False,
         hasrtype=False,

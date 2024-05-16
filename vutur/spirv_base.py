@@ -7,10 +7,13 @@ TODO
 """
 
 from __future__ import annotations
-from typing import Union, assert_never
+from typing import Union, assert_never, TYPE_CHECKING
 from dataclasses import dataclass, field
 from io import BytesIO
 import struct
+
+if TYPE_CHECKING:
+    from vutur.spirv_instructions import Op
 
 base_argtype = Union[None, "SpirvInstruction", str, int, float]
 argtype = Union[tuple["argtype", ...], base_argtype]
@@ -18,7 +21,7 @@ argtype = Union[tuple["argtype", ...], base_argtype]
 
 @dataclass(frozen=True)
 class SpirvInstruction:
-    opcode: int
+    opcode: Op
     args: tuple[argtype, ...]
     hasresult: bool
     hasrtype: bool

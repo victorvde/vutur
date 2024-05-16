@@ -186,7 +186,7 @@ def main() -> None:
     for instruction in instructions:
         opname = instruction.pop("opname")
         _class = instruction.pop("class", None)
-        opcode = instruction.pop("opcode")
+        _opcode = instruction.pop("opcode")
         _version = instruction.pop("version", None)
         _lastversion = instruction.pop("lastVersion", None)
         operands = instruction.pop("operands", [])
@@ -250,7 +250,7 @@ def main() -> None:
         else:
             print(") -> SpirvInstruction:")
         print("    return SpirvInstruction(")
-        print(f"        {opcode=},")
+        print(f"        opcode=Op.{opname[2:]},")
         print(
             f"        args=({", ".join(usednames)}{"," if len(usednames) == 1 else ""}),"
         )
