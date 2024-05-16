@@ -40,31 +40,30 @@ class SpirvInstruction:
             args_b += encode_arg(s, arg)
         wordcount = len(args_b) // 4 + 1
         first = (wordcount << 16) + self.opcode
-        first_b = first.to_bytes(length=4, byteorder="little")
-        s.write(first_b)
+        s.write_i(first)
         s.write(args_b)
 
 
 def encode_arg(s: Serializer, arg: argtype) -> bytes:
     match arg:
         case tuple():
-            return b"".join((encode_arg(s, e) for e in arg))
+            r = b"".join((encode_arg(s, e) for e in arg))
         case None:
-            return b""
+            r = b""
         case str():
-            rb = arg.encode()
-            while len(rb) % 4 != 0:
-                rb += b"\0"
-            return rb
+            r = arg.encode()
+            while len(r) % 4 != 0:
+                r += b"\0"
         case int():
-            return arg.to_bytes(length=4, byteorder="little")
+            r = arg.to_bytes(length=4, byteorder="little")
         case float():
-            return struct.pack("<f", arg)
+            r = struct.pack("<f", arg)
         case SpirvInstruction():
             ri = s.gensym(arg)
-            return ri.to_bytes(length=4, byteorder="little")
+            r = ri.to_bytes(length=4, byteorder="little")
         case _:
             assert_never(arg)
+    return r
 
 
 @dataclass
@@ -83,3 +82,6 @@ class Serializer:
 
     def write(self, b: bytes) -> None:
         self.out.write(b)
+
+    def write_i(self, i: int) -> None:
+        self.write(i.to_bytes(length=4, byteorder="little"))
