@@ -70,7 +70,7 @@ def encode_arg(s: Serializer, arg: argtype) -> bytes:
 class Serializer:
     out: BytesIO
     ids: dict[SpirvInstruction, int] = field(default_factory=dict)
-    max_id: int = 0
+    max_id: int = 1
 
     def gensym(self, ins: SpirvInstruction) -> int:
         i = self.ids.get(ins)
