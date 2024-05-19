@@ -51,7 +51,7 @@ def encode_arg(s: Serializer, arg: argtype) -> bytes:
         case None:
             r = b""
         case str():
-            r = arg.encode()
+            r = arg.encode() + b"\0"
             while len(r) % 4 != 0:
                 r += b"\0"
         case int():

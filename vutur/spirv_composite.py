@@ -1,12 +1,5 @@
 from vutur.spirv_base import SpirvInstruction, Serializer
-from vutur.spirv_instructions import (
-    OpFunctionEnd,
-    Op,
-    ANNOTATION_OPS,
-    CONSTANT_OPS,
-    TYPEDECL_OPS,
-    SPIRV_MAGIC_NUMBER,
-)
+import vutur.spirv_instructions as si
 from io import BytesIO
 from dataclasses import dataclass
 import subprocess
@@ -36,25 +29,25 @@ class SpirvFunction:
             yield p
         for b in self.blocks:
             yield from b.iter_instructions()
-        yield OpFunctionEnd()
+        yield si.OpFunctionEnd()
 
 
 # https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#_logical_layout_of_a_module
 module_globals = [
-    [Op.Capability],
-    [Op.Extension],
-    [Op.ExtInstImport],
-    [Op.MemoryModel],
-    [Op.EntryPoint],
-    [Op.ExecutionMode, Op.ExecutionModeId],
-    [Op.String, Op.SourceExtension, Op.Source, Op.SourceContinued],
-    [Op.Name, Op.MemberName],
-    [Op.ModuleProcessed],
-    ANNOTATION_OPS,
-    TYPEDECL_OPS,  # todo: toposort these?
-    CONSTANT_OPS,  # todo: toposort these?
+    [si.Op.Capability],
+    [si.Op.Extension],
+    [si.Op.ExtInstImport],
+    [si.Op.MemoryModel],
+    [si.Op.EntryPoint],
+    [si.Op.ExecutionMode, si.Op.ExecutionModeId],
+    [si.Op.String, si.Op.SourceExtension, si.Op.Source, si.Op.SourceContinued],
+    [si.Op.Name, si.Op.MemberName],
+    [si.Op.ModuleProcessed],
+    si.ANNOTATION_OPS,
+    si.TYPEDECL_OPS,
+    si.CONSTANT_OPS,
     # todo: OpVariable globals
-    [Op.Undef],
+    [si.Op.Undef],
 ]
 module_globals_lookup = {}
 for i, ops in enumerate(module_globals):
@@ -68,7 +61,6 @@ def is_global(ins: SpirvInstruction) -> bool:
 
 @dataclass(frozen=True)
 class SpirvModule:
-    global_instructions: list[SpirvInstruction]
     func_decls: list[SpirvFunction]
     func_defs: list[SpirvFunction]
 
@@ -93,7 +85,13 @@ class SpirvModule:
         for ins in self.iter_instructions():
             dfs(ins)
 
-        r = self.global_instructions + list(d.keys())
+        defaults = (
+            si.OpCapability(si.Capability.Shader),
+            si.OpMemoryModel(si.AddressingModel.Logical, si.MemoryModel.GLSL450),
+            si.OpEntryPoint(si.ExecutionModel.GLCompute, self.func_defs[0].function, "main"),
+        )
+
+        r = defaults + tuple(d.keys())
         return sorted(r, key=lambda x: module_globals_lookup[x.opcode])
 
     def serialize(self) -> bytes:
@@ -106,7 +104,7 @@ class SpirvModule:
             ins.serialize(s)
 
         hs = Serializer(BytesIO())
-        hs.write_i(SPIRV_MAGIC_NUMBER)
+        hs.write_i(si.SPIRV_MAGIC_NUMBER)
         hs.write_i((1 << 16) | (3 << 8))  # version 1.3
         hs.write_i(0)  # todo: register generator id with Khronos
         hs.write_i(s.max_id)
