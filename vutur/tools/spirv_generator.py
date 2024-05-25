@@ -190,7 +190,9 @@ def main() -> None:
         _version = instruction.pop("version", None)
         _lastversion = instruction.pop("lastVersion", None)
         operands = instruction.pop("operands", [])
-        _capabilities = instruction.pop("capabilities", []) # not handled automatically yet
+        _capabilities = instruction.pop(
+            "capabilities", []
+        )  # not handled automatically yet
         _extensions = instruction.pop("extensions", [])
         assert len(instruction) == 0, instruction.keys()
 

@@ -88,7 +88,9 @@ class SpirvModule:
         defaults = (
             si.OpCapability(si.Capability.Shader),
             si.OpMemoryModel(si.AddressingModel.Logical, si.MemoryModel.GLSL450),
-            si.OpEntryPoint(si.ExecutionModel.GLCompute, self.func_defs[0].function, "main"),
+            si.OpEntryPoint(
+                si.ExecutionModel.GLCompute, self.func_defs[0].function, "main"
+            ),
         )
 
         r = defaults + tuple(d.keys())
