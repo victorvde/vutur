@@ -75,7 +75,9 @@ class SpirvModule:
         d: dict[SpirvInstruction, None] = {}
 
         def dfs(ins: SpirvInstruction) -> None:
-            for arg in ins.args:
+            if ins in d:
+                return
+            for arg in ins.args + ins.dependencies:
                 if not isinstance(arg, SpirvInstruction):
                     continue
                 dfs(arg)

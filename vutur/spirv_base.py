@@ -25,6 +25,7 @@ class SpirvInstruction:
     args: tuple[argtype, ...]
     hasresult: bool
     hasrtype: bool
+    dependencies: tuple["SpirvInstruction", ...]
 
     def serialize(self, s: Serializer) -> None:
         args_b = b""
