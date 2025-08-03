@@ -43,7 +43,7 @@ def load_kind_types(fn: str) -> dict[str, str]:
             case "Composite":
                 bases = operand_kind["bases"]
                 ts = [kind_types[k] for k in bases]
-                t = f"tuple[{", ".join(ts)}]"
+                t = f"tuple[{', '.join(ts)}]"
                 kind_types[kind] = t
             case e:
                 assert False, e
@@ -240,7 +240,7 @@ def main() -> None:
             t = kind_types[kind]
             comment = ""
             if name is not None:
-                comment = f"  # {" ".join(name.splitlines())}"
+                comment = f"  # {' '.join(name.splitlines())}"
             match quantifier:
                 case None:
                     print(f"    {varname}: {t},{comment}")
@@ -255,7 +255,7 @@ def main() -> None:
         print("    return SpirvInstruction(")
         print(f"        opcode=Op.{opname[2:]},")
         print(
-            f"        args=({", ".join(usednames)}{"," if len(usednames) == 1 else ""}),"
+            f"        args=({', '.join(usednames)}{',' if len(usednames) == 1 else ''}),"
         )
         print(f"        {hasresult=},")
         print(f"        {hasrtype=},")
