@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Self, TypeAlias
+from typing import cast, Self, TypeAlias
 
 
 @dataclass(slots=True)
@@ -70,14 +70,14 @@ class ModuleDef[T]:
         skeleton_it = iter(self.skeleton)
         values_it = iter(self.values)
 
-        def inner() -> T:
+        def inner() -> object:
             mtype, fields = next(skeleton_it)
             m: T = object.__new__(mtype)
             object.__setattr__(m, "_fields", fields)
             for name, field in fields.items():
                 match field:
                     case ModuleField():
-                        value: object = inner()
+                        value = inner()
                     case Field():
                         w = next(values_it)
                         match w:
@@ -93,7 +93,7 @@ class ModuleDef[T]:
                 object.__setattr__(m, name, value)
             return m
 
-        return inner()
+        return cast(T, inner())
 
 
 class Module:
