@@ -22,6 +22,7 @@ lint:
 
 typecheck:
 	mypy .
+	ty check
 
 test:
 	pytest -q

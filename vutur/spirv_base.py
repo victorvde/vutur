@@ -62,7 +62,7 @@ def encode_arg(s: Serializer, arg: argtype) -> bytes:
             ri = s.gensym(arg)
             r = ri.to_bytes(length=4, byteorder="little")
         case _:
-            assert_never(arg)
+            assert_never(arg)  # ty: ignore[type-assertion-failure] # still a ty @Todo
     return r
 
 

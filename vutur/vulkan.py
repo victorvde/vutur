@@ -88,16 +88,16 @@ class VulkanContext:
     extensions: set[str]
     debug_callback: object  # vk.VkDebugUtilsMessengerEXT
     physicaldevice: object  # vk.VkPhysicalDevice
-    physicaldevice_properties: vk.VkPhysicalDeviceProperties2
+    physicaldevice_properties: Any  # vk.VkPhysicalDeviceProperties2
     device_extensions: set[str]
     queuefamily: int
     device: object  # vk.VkDevice
     queue: object  # vk.VkQueue
     commandpool_pool: list[object]  # list[vk.vkCommandPool]
     descriptors: dict[int, Descriptors]  # dict[memtype, Descriptors]
-    memory_properties: vk.VkPhysicalDeviceMemoryProperties2
-    buffer_create_info: vk.VkBufferCreateInfo
-    buffer_requirements: vk.VkMemoryRequirements
+    memory_properties: Any  # vk.VkPhysicalDeviceMemoryProperties2
+    buffer_create_info: Any  # vk.VkBufferCreateInfo
+    buffer_requirements: Any  # vk.VkMemoryRequirements
     memorytypes: list[int]
     device_memory: int
     upload_memory: int
@@ -233,7 +233,7 @@ class VulkanContext:
 
         flags = 0
         if vk.VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME in self.extensions:
-            flags |= vk.VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT
+            flags |= vk.VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR
 
         createInfo = vk.VkInstanceCreateInfo(
             flags=flags,
@@ -574,7 +574,7 @@ class VulkanContext:
         )
         try:
             mem = vk.vkAllocateMemory(self.device, mai, None)
-        except (vk.VK_ERROR_OUT_OF_HOST_MEMORY, vk.VK_ERROR_OUT_OF_DEVICE_MEMORY):
+        except (vk.VkErrorOutOfHostMemory, vk.VkErrorOutOfDeviceMemory):
             raise OutOfMemory
 
         bci = self.buffer_create_info  # todo: does this copy?
@@ -771,7 +771,7 @@ class VulkanContext:
         self.release_commandpool(commandpool)
 
     def upload(
-        self, suballocation: VulkanSuballocation, src: Union[bytes, bytearray]
+        self, suballocation: VulkanSuballocation, src_bytes: Union[bytes, bytearray]
     ) -> None:
         """
         Upload bytes to a Vulkan suballocation (asynchronous).
@@ -780,7 +780,7 @@ class VulkanContext:
 
         self.maintain()
 
-        src = memoryview(src)
+        src = memoryview(src_bytes)
         assert src.nbytes == suballocation.size, (src.nbytes, suballocation.size)
 
         use_staging = suballocation.memtypeidx != self.upload_memory
