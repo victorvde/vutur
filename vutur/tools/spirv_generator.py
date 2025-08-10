@@ -248,6 +248,8 @@ def main() -> None:
                     print(f"    {varname}: Optional[{t}] = None,{comment}")
                 case "*":
                     print(f"    *{varname}: {t},{comment}")
+                case _:
+                    assert False, f"Unknown quantifier {quantifier} for {opname}"
         if not hasarguments:
             print(f"def {opname}() -> SpirvInstruction:")
         else:
