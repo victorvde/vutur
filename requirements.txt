@@ -5,4 +5,4 @@ cffi==1.17.1
 pycparser==2.22
     # via cffi
 vulkan==1.3.275.1
-    # via vutur (pyproject.toml)
+    # via vgrad (pyproject.toml)

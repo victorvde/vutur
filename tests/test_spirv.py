@@ -1,5 +1,5 @@
-import vutur.spirv_instructions as si
-import vutur.spirv_composite as sc
+import vgrad.spirv_instructions as si
+import vgrad.spirv_composite as sc
 
 
 def test_empty_module() -> None:

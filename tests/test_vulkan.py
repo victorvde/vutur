@@ -1,4 +1,4 @@
-from vutur.vulkan import VulkanContext
+from vgrad.vulkan import VulkanContext
 
 import pytest
 

@@ -1,4 +1,4 @@
-from vutur.module import Module, Trainable, Static, Dynamic, is_trainable, is_dynamic
+from vgrad.module import Module, Trainable, Static, Dynamic, is_trainable, is_dynamic
 
 
 class SubModule(Module):

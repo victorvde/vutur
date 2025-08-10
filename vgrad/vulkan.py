@@ -12,7 +12,7 @@ Transient Vulkan objects are destroyed once we notice they are no longer used by
 Command pools are created when necessary and reused.
 Descriptor pools, sets, and set layouts are created on demand and cached until invalidated.
 
-Memory is allocated in 512MiB chunks, and suballocated using `vutur.allocator`.
+Memory is allocated in 512MiB chunks, and suballocated using `vgrad.allocator`.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ import os
 import logging
 from typing import Any, Optional, Callable, Union
 
-from vutur.allocator import Allocator, Allocation, OutOfMemory
+from vgrad.allocator import Allocator, Allocation, OutOfMemory
 
 import vulkan as vk
 
@@ -113,13 +113,13 @@ class VulkanContext:
         """
         Arguments:
         * `device_filter`: optional substring for the device to select.
-          Can also be specified with the VUTUR_DEVICE environment variable.
+          Can also be specified with the VGRAD_DEVICE environment variable.
         * `prefer_separate_memory`: don't use unified memory, mostly for testing purposes.
         """
         self.destroyed = False
 
         if device_filter is None:
-            device_filter = os.getenv("VUTUR_DEVICE", "")
+            device_filter = os.getenv("VGRAD_DEVICE", "")
 
         self.create_instance(
             version=vk.VK_MAKE_VERSION(1, 1, 0),
@@ -226,7 +226,7 @@ class VulkanContext:
         applicationInfo = vk.VkApplicationInfo(
             pApplicationName=None,
             applicationVersion=0,
-            pEngineName="vutur",
+            pEngineName="vgrad",
             engineVersion=0,
             apiVersion=version,
         )

@@ -1,8 +1,8 @@
 import pytest
 
-pytest.register_assert_rewrite("vutur.allocator")
+pytest.register_assert_rewrite("vgrad.allocator")
 
-from vutur.allocator import Allocator, OutOfMemory, NeedsFragmentation  # noqa: E402
+from vgrad.allocator import Allocator, OutOfMemory, NeedsFragmentation  # noqa: E402
 
 
 class Memory:

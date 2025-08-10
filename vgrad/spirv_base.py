@@ -13,7 +13,7 @@ from io import BytesIO
 import struct
 
 if TYPE_CHECKING:
-    from vutur.spirv_instructions import Op
+    from vgrad.spirv_instructions import Op
 
 base_argtype = Union[None, "SpirvInstruction", str, int, float]
 argtype = Union[tuple["argtype", ...], base_argtype]

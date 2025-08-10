@@ -1,5 +1,5 @@
-from vutur.spirv_base import SpirvInstruction, Serializer
-import vutur.spirv_instructions as si
+from vgrad.spirv_base import SpirvInstruction, Serializer
+import vgrad.spirv_instructions as si
 from io import BytesIO
 from dataclasses import dataclass
 import subprocess

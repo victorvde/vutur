@@ -31,11 +31,11 @@ test-v:
 	pytest -s -o log_cli=true -o log_cli_level=debug
 
 cov:
-	pytest -q --cov=vutur --cov-report html
+	pytest -q --cov=vgrad --cov-report html
 	xdg-open htmlcov/index.html
 
 docs:
-	pdoc vutur -o docs_build
+	pdoc vgrad -o docs_build
 
-vutur/spirv_instructions.py: vutur/tools/spirv_generator.py
-	python vutur/tools/spirv_generator.py  ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json > vutur/spirv_instructions.py
+vgrad/spirv_instructions.py: vgrad/tools/spirv_generator.py
+	python vgrad/tools/spirv_generator.py  ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json > vgrad/spirv_instructions.py

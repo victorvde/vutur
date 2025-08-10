@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "vutur"
+name = "vgrad"
 version = "0.0.1"
 authors = [
     { name = "Victor van den Elzen", email = "victor.vde@gmail.com" },
