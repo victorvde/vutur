@@ -62,7 +62,8 @@ class Reference:
 
 
 @dataclass
-class ModuleDef[T]:
+class ModuleDef[T: Module]:
+    nsplits: int
     skeleton: list[tuple[type, dict[str, Field | ModuleField]]]
     values: list[DirectValue | Reference]
 
@@ -94,6 +95,49 @@ class ModuleDef[T]:
             return m
 
         return cast(T, inner())
+
+    def resplit(self, m: T) -> list[list[object]]:
+        split_values: list[list[object]] = [[] for i in range(self.nsplits)]
+
+        skeleton_it = iter(self.skeleton)
+        values_it = iter(self.values)
+
+        def inner(m: "Module") -> None:
+            mytpe, fields = next(skeleton_it)
+
+            for name, field in fields.items():
+                match field:
+                    case Field():
+                        w = next(values_it)
+                        match w:
+                            case DirectValue():
+                                assert getattr(m, name) is w.value, (
+                                    f"Value {name} changed when resplit-ing"
+                                )
+                            case Reference():
+                                if w.source is None:
+                                    box = self.values[w.index]
+                                    assert isinstance(box, DirectValue)
+                                    assert self.values[w.index] is getattr(m, name), (
+                                        f"Shared value {name} is no longer shared when resplit-ing"
+                                    )
+                                else:
+                                    vs = split_values[w.source]
+                                    if w.index < len(vs):
+                                        assert vs[w.index] is getattr(m, name), (
+                                            f"Shared value {name} is no longer shared when resplit-ing"
+                                        )
+                                    else:
+                                        assert w.index == len(vs), (
+                                            f"Invalid index error for {name} when resplit-ing, ModuleDef corrupted?"
+                                        )
+                                        vs.append(getattr(m, name))
+                    case ModuleField():
+                        inner(getattr(m, name))
+
+        inner(m)
+
+        return split_values
 
 
 class Module:
@@ -171,4 +215,4 @@ class Module:
 
         inner(self)
 
-        return ModuleDef(skeleton, values), split_values
+        return ModuleDef(len(split_values), skeleton, values), split_values
