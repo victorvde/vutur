@@ -3,39 +3,33 @@
 all: format lint typecheck
 
 venv: 
-	python3 -m venv .venv
+	uv venv
 
-requirements.txt:
-	uv pip compile pyproject.toml --upgrade -o requirements.txt
-
-requirements-dev.txt:
-	uv pip compile pyproject.toml --extra dev -o requirements-dev.txt
-
-install: requirements-dev.txt
-	uv pip sync requirements-dev.txt
+sync:
+	uv sync
 
 format:
-	ruff format
+	uv run ruff format
 
 lint:
-	ruff check
+	uv run ruff check
 
 typecheck:
-	mypy .
-	ty check
+	uv run  mypy .
+	uv run ty check
 
 test:
-	pytest -q
+	uv run pytest -q
 
 test-v:
-	pytest -s -o log_cli=true -o log_cli_level=debug
+	uv run pytest -s -o log_cli=true -o log_cli_level=debug
 
 cov:
-	pytest -q --cov=vgrad --cov-report html
+	uv run pytest -q --cov=vgrad --cov-report html
 	xdg-open htmlcov/index.html
 
 docs:
-	pdoc vgrad -o docs_build
+	uv run pdoc vgrad -o docs_build
 
 vgrad/spirv_instructions.py: vgrad/tools/spirv_generator.py
-	python vgrad/tools/spirv_generator.py  ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json > vgrad/spirv_instructions.py
+	uv run python vgrad/tools/spirv_generator.py  ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json ../SPIRV-Headers/include/spirv/unified1/spirv.core.grammar.json > vgrad/spirv_instructions.py

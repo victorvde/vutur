@@ -21,8 +21,6 @@ fi
 # run tests in a subshell so that we end up back in the current
 # directory when everything finishes.
 (
-  source .venv/bin/activate
-
   cd $tmpdir
 
   make

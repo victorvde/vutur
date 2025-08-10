@@ -11,12 +11,11 @@ authors = [
 requires-python = ">=3.12"
 dependencies = ["vulkan>=1.3.275.1"]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "ruff",
     "mypy",
     "ty",
-    "uv",
     # testing
     "pytest",
     "pytest-cov",
