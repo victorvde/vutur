@@ -27,7 +27,9 @@ dev = [
 [tool.mypy]
 disallow_untyped_defs = true
 check_untyped_defs = true
-enable_error_code = ["exhaustive-match"]
+strict_equality = true
+disallow_any_generics = true
+enable_error_code = ["exhaustive-match", "redundant-expr"]
 
 [[tool.mypy.overrides]]
 module = "vulkan.*"
