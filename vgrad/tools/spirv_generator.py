@@ -106,13 +106,16 @@ def main() -> None:
                     _parameters = enumerant.pop("parameters", [])
                     _capabilities = enumerant.pop("capabilities", [])
                     _extensions = enumerant.pop("extensions", [])
-                    assert len(enumerant) == 0, enumerant.keys()
+                    aliases = enumerant.pop("aliases", [])
+                    assert len(enumerant) == 0, (kind, enumerant.keys())
 
                     if enumerant_ == "None":
-                        assert value == "0x0000", value
+                        assert value in ("0x0000", "0x0"), (kind, value)
                         continue
 
-                    print(f"    {sanitize(enumerant_)} = {value}")
+                    for alias in [enumerant_, *aliases]:
+                        print(f"    {sanitize(alias)} = {value}")
+
             case "ValueEnum":
                 print()
                 print()
@@ -194,7 +197,12 @@ def main() -> None:
             "capabilities", []
         )  # not handled automatically yet
         _extensions = instruction.pop("extensions", [])
+        aliases = instruction.pop("aliases", [])
+        provisional = instruction.pop("provisional", False)
         assert len(instruction) == 0, instruction.keys()
+
+        if provisional:
+            continue
 
         usednames = []
         varnames = [
@@ -213,9 +221,7 @@ def main() -> None:
             "j",
             "k",
         ]
-        print()
-        print()
-        hasarguments = False
+        arguments = []
         hasresult = False
         hasrtype = False
         for operand in operands:
@@ -233,9 +239,6 @@ def main() -> None:
                 case _:
                     varname = varnames.pop(0)
                     usednames.append(varname)
-            if not hasarguments:
-                print(f"def {opname}(")
-                hasarguments = True
             assert len(operand) == 0, operand.keys()
             t = kind_types[kind]
             comment = ""
@@ -243,25 +246,32 @@ def main() -> None:
                 comment = f"  # {' '.join(name.splitlines())}"
             match quantifier:
                 case None:
-                    print(f"    {varname}: {t},{comment}")
+                    arguments.append(f"    {varname}: {t},{comment}")
                 case "?":
-                    print(f"    {varname}: Optional[{t}] = None,{comment}")
+                    arguments.append(f"    {varname}: Optional[{t}] = None,{comment}")
                 case "*":
-                    print(f"    *{varname}: {t},{comment}")
+                    arguments.append(f"    *{varname}: {t},{comment}")
                 case _:
                     assert False, f"Unknown quantifier {quantifier} for {opname}"
-        if not hasarguments:
-            print(f"def {opname}() -> SpirvInstruction:")
-        else:
-            print(") -> SpirvInstruction:")
-        print("    return SpirvInstruction(")
-        print(f"        opcode=Op.{opname[2:]},")
-        print(
-            f"        args=({', '.join(usednames)}{',' if len(usednames) == 1 else ''}),"
-        )
-        print(f"        {hasresult=},")
-        print(f"        {hasrtype=},")
-        print("    )")
+
+        for alias in [opname, *aliases]:
+            print()
+            print()
+            if arguments:
+                print(f"def {alias}(")
+                for argument in arguments:
+                    print(argument)
+                print(") -> SpirvInstruction:")
+            else:
+                print(f"def {alias}() -> SpirvInstruction:")
+            print("    return SpirvInstruction(")
+            print(f"        opcode=Op.{opname[2:]},")
+            print(
+                f"        args=({', '.join(usednames)}{',' if len(usednames) == 1 else ''}),"
+            )
+            print(f"        {hasresult=},")
+            print(f"        {hasrtype=},")
+            print("    )")
 
 
 if __name__ == "__main__":
